@@ -50,8 +50,7 @@ BLOK.WorldCell = function(i,j) {
 	this.renderer = new PIXI.RenderTexture(CELL_SIZE*40, CELL_SIZE*40);
 	this.sprite = new PIXI.Sprite(this.renderer);
 	this.sprite.x = i*40*CELL_SIZE;
-	this.sprite.y = j*40*CELL_SIZE;
-	if((i+j) % 2) this.sprite.tint = 0xFFAAAA;
+	if((i+j) % 2) this.sprite.tint = 0xAAAAAA;
 	this.rendered = false;
 	this.i = i;
 	this.j = j;
@@ -143,13 +142,16 @@ function initCells(w,h) {
 	return worldCells;
 }
 
+var tileColours = [ 0x007700, 0x000077, 0x770000, 0x007777 ];
+
 /**
  * Generate a single tile as a PIXI object
  * i,j: The location on the tile grid where this tile appears
  */
 function tile(i, j) {
 	var graphics = new PIXI.Graphics();
-	graphics.beginFill(0x007700);
+
+	graphics.beginFill(tileColours[Math.floor(Math.random()*tileColours.length)]);
 	graphics.drawRect(-18,-18,36,36);
 	graphics.endFill();
 	graphics.i = i;
