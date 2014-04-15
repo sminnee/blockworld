@@ -64,7 +64,7 @@ function initCells(w,h) {
 		var cellI = Math.floor(tile.i/8);
 		var cellJ = Math.floor(tile.j/8);
 		this[cellI][cellJ].addChild(tile);
-	}
+	};
 
 	return worldCells;
 }
@@ -95,7 +95,6 @@ function tile(i, j) {
 		this.endFill();
 	};
 
-	//console.log(graphics.getBounds());
 	return graphics;
 }
 
@@ -185,10 +184,12 @@ function animate() {
 stage.mousedown = function() {
 	var pos = this.getMousePosition();
 	this.dragOffset = { x: pos.x-worldLayer.x,y:pos.y-worldLayer.y } ;
-}
+};
+
 stage.mouseup = function() {
 	this.dragOffset = null;
-}
+};
+
 stage.mousemove = function() {
 	if(this.dragOffset) {
 		var point = this.getMousePosition();
@@ -196,4 +197,4 @@ stage.mousemove = function() {
 		worldLayer.y = point.y - this.dragOffset.y;
 		loadCells(worldLayer, renderer);
 	}
-}
+};
