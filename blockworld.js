@@ -1,6 +1,8 @@
 var WORLD_W = 128;
 var WORLD_H = 128;
 
+var CELL_SIZE = 8;
+
 var BLOK = {};
 
 /**
@@ -10,6 +12,12 @@ var BLOK = {};
  */
 BLOK.WorldCell = function(i,j) {
 	this.container = new PIXI.DisplayObjectContainer();
+	this.renderer = new PIXI.RenderTexture(CELL_SIZE*40, CELL_SIZE*40);
+	this.sprite = new PIXI.Sprite(this.renderer);
+	this.sprite.x = i*40*CELL_SIZE;
+	this.sprite.y = j*40*CELL_SIZE;
+	if((i+j) % 2) this.sprite.tint = 0xFFAAAA;
+	this.rendered = false;
 	this.i = i;
 	this.j = j;
 };
@@ -19,7 +27,12 @@ BLOK.WorldCell = function(i,j) {
  * @param PIXI.DisplayObject child
  */
 BLOK.WorldCell.prototype.addChild = function(child) {
+	var offsetI = child.i - this.i*CELL_SIZE;
+	var offsetJ = child.j - this.j*CELL_SIZE;
+	child.x = offsetI * 40 + 20;
+	child.y = offsetJ * 40 + 20;
 	this.container.addChild(child);
+	this.rendered = false;
 };
 
 /**
@@ -27,9 +40,11 @@ BLOK.WorldCell.prototype.addChild = function(child) {
  * @param PIXI.DisplayObjectContainer parent
  */
 BLOK.WorldCell.prototype.addTo = function(parent) {
-	this.container.i = this.i;
-	this.container.j = this.j;
-	parent.addChild(this.container);
+	if(!this.rendered) this.render();
+
+	this.sprite.i = this.i;
+	this.sprite.j = this.j;
+	parent.addChild(this.sprite);
 };
 
 /**
@@ -38,7 +53,16 @@ BLOK.WorldCell.prototype.addTo = function(parent) {
  * @return Boolean
  */
 BLOK.WorldCell.prototype.isContainedBy = function(parent) {
-	return (parent.children.indexOf(this.container) != -1);
+	return (parent.children.indexOf(this.sprite) != -1);
+};
+
+/**
+ * Add a child element (e.g. a tile) to this cell
+ * @param PIXI.DisplayObject child
+ */
+BLOK.WorldCell.prototype.render = function(child) {
+	this.renderer.render(this.container);
+	this.rendered = true;
 };
 
 BLOK.WorldCell.prototype.constructor = BLOK.WorldCell;
@@ -47,7 +71,7 @@ BLOK.WorldCell.prototype.constructor = BLOK.WorldCell;
 /**
  * Initialise a w x h array of world cells.
  * The world elements are grouped into cells (each a PIXI.DisplayObjectContainer), which each
- * define an 8x8 area of the map. The cells are loaded to/from display memory (i.e., the worldLayer),
+ * define an CELL_SIZExCELL_SIZE area of the map. The cells are loaded to/from display memory (i.e., the worldLayer),
  * to ensure that rendering is quick when opening large maps.
  */
 function initCells(w,h) {
@@ -61,8 +85,8 @@ function initCells(w,h) {
 
 	// Funciton to add a tile
 	worldCells.addChild = function(tile) {
-		var cellI = Math.floor(tile.i/8);
-		var cellJ = Math.floor(tile.j/8);
+		var cellI = Math.floor(tile.i/CELL_SIZE);
+		var cellJ = Math.floor(tile.j/CELL_SIZE);
 		this[cellI][cellJ].addChild(tile);
 	};
 
@@ -74,14 +98,10 @@ function initCells(w,h) {
  * i,j: The location on the tile grid where this tile appears
  */
 function tile(i, j) {
-	var x = i*40+20;
-	var y = j*40+20;
 	var graphics = new PIXI.Graphics();
 	graphics.beginFill(0x007700);
 	graphics.drawRect(-18,-18,36,36);
 	graphics.endFill();
-	graphics.x = x;
-	graphics.y = y;
 	graphics.i = i;
 	graphics.j = j;
 
@@ -106,10 +126,10 @@ function loadCells(worldLayer, renderer) {
 	var x = -worldLayer.x / scale;
 	var y = -worldLayer.y / scale;
 
-	var minI = Math.max(0,Math.floor(x/40/8));
-	var minJ = Math.max(0,Math.floor(y/40/8));
-	var maxI = Math.min(WORLD_W/8-1, minI + Math.ceil((renderer.width/40)/scale/8));
-	var maxJ = Math.min(WORLD_H/8-1, minJ + Math.ceil((renderer.height/40)/scale/8));
+	var minI = Math.max(0,Math.floor(x/40/CELL_SIZE));
+	var minJ = Math.max(0,Math.floor(y/40/CELL_SIZE));
+	var maxI = Math.min(WORLD_W/CELL_SIZE-1, minI + Math.ceil((renderer.width/40)/scale/CELL_SIZE));
+	var maxJ = Math.min(WORLD_H/CELL_SIZE-1, minJ + Math.ceil((renderer.height/40)/scale/CELL_SIZE));
 
 	var cellsLoaded = minI+','+minJ+','+maxI+','+maxJ;
 
@@ -156,11 +176,9 @@ window.onresize = function() {
 var worldLayer = new PIXI.DisplayObjectContainer();
 
 stage.addChild(worldLayer);
-var scale = 1.0;
-//worldLayer.scale = new PIXI.Point(0.25,0.25);
 
-// Initialize world cells: 2d array of 8x8 cells
-var worldCells = initCells(WORLD_W/8, WORLD_H/8);
+// Initialize world cells: 2d array of CELL_SIZExCELL_SIZE cells
+var worldCells = initCells(WORLD_W/CELL_SIZE, WORLD_H/CELL_SIZE);
 
 // Initialize ground
 for(var i=0;i<WORLD_W;i++) {
