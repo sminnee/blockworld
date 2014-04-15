@@ -216,3 +216,20 @@ stage.mousemove = function() {
 		loadCells(worldLayer, renderer);
 	}
 };
+
+window.onkeydown = function(e) {
+	switch(e.keyCode) {
+		// +
+		case 187:
+			worldLayer.scale = new PIXI.Point(worldLayer.scale.x*1.5,worldLayer.scale.y*1.5);
+			loadCells(worldLayer, renderer);
+			break;
+
+		// -
+		case 189:
+			worldLayer.scale = new PIXI.Point(worldLayer.scale.x/1.5,worldLayer.scale.y/1.5);
+			loadCells(worldLayer, renderer);
+			break;
+
+	}
+}
