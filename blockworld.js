@@ -87,14 +87,16 @@ function tile(i, j) {
 	graphics.i = i;
 	graphics.j = j;
 
-/*	graphics.interactive = true;
+	graphics.hitArea = new PIXI.Rectangle(-20, -20, 40, 40);
+	graphics.interactive = true;
+	graphics.buttonMode = true;
+
 	graphics.click = function() {
-		console.log('hi');
 		this.beginFill(0x0000FF);
 		this.drawRect(-18,-18,36,36);
 		this.endFill();
 	};
-*/
+
 	//console.log(graphics.getBounds());
 	return graphics;
 }
