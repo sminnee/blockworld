@@ -1,7 +1,6 @@
 const WORLD_W = 128;
 const WORLD_H = 128;
 
-
 /**
  * Initialise PIXI: renderer, stage, and worldLayer
  */
@@ -10,10 +9,13 @@ const WORLD_H = 128;
 var stage = new PIXI.Stage(0x333333);
 
 // create a renderer instance.
-var renderer = PIXI.autoDetectRenderer(800, 600);
-
-// add the renderer view element to the DOM
+var renderer = PIXI.autoDetectRenderer(window.innerWidth,window.innerHeight);
 document.body.appendChild(renderer.view);
+
+window.onresize = function() {
+	renderer.resize(window.innerWidth,window.innerHeight);
+	loadCells(worldLayer, renderer);
+}
 
 var worldLayer = new PIXI.DisplayObjectContainer();
 
@@ -30,7 +32,7 @@ for(var i=0;i<WORLD_W;i++) {
 		worldCells.addChild(tile(i,j));
 	}
 }
-loadCells(worldLayer);
+loadCells(worldLayer, renderer);
 
 // Animation loop
 requestAnimFrame(animate);
@@ -39,7 +41,7 @@ function animate() {
 //	worldLayer.scale = new PIXI.Point(scale,scale);
 //	loadCells(worldLayer);
     requestAnimFrame(animate);
-    renderer.render(stage);
+    if(renderer) renderer.render(stage);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,15 +106,15 @@ function tile(i, j) {
 /**
  * Load the cells into the worldLayer that would currently be visible
  */
-function loadCells(worldLayer) {
+function loadCells(worldLayer, renderer) {
 	var scale = worldLayer.scale.x; // assume x==y
 	var x = -worldLayer.x / scale;
 	var y = -worldLayer.y / scale;
 
 	var minI = Math.max(0,Math.floor(x/40/8));
 	var minJ = Math.max(0,Math.floor(y/40/8));
-	var maxI = Math.min(WORLD_W/8-1, minI + Math.ceil((800/40)/scale/8));
-	var maxJ = Math.min(WORLD_H/8-1, minJ + Math.ceil((600/40)/scale/8));
+	var maxI = Math.min(WORLD_W/8-1, minI + Math.ceil((renderer.width/40)/scale/8));
+	var maxJ = Math.min(WORLD_H/8-1, minJ + Math.ceil((renderer.height/40)/scale/8));
 
 	var cellsLoaded = minI+','+minJ+','+maxI+','+maxJ;
 
@@ -148,6 +150,6 @@ stage.mousemove = function() {
 		var point = this.getMousePosition();
 		worldLayer.x = point.x - this.dragOffset.x;
 		worldLayer.y = point.y - this.dragOffset.y;
-		loadCells(worldLayer);
+		loadCells(worldLayer, renderer);
 	}
 }
