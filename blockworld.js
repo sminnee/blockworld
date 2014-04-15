@@ -50,6 +50,7 @@ BLOK.WorldCell = function(i,j) {
 	this.renderer = new PIXI.RenderTexture(CELL_SIZE*40, CELL_SIZE*40);
 	this.sprite = new PIXI.Sprite(this.renderer);
 	this.sprite.x = i*40*CELL_SIZE;
+	this.sprite.y = j*40*CELL_SIZE;
 	if((i+j) % 2) this.sprite.tint = 0xAAAAAA;
 	this.rendered = false;
 	this.i = i;
@@ -74,7 +75,7 @@ BLOK.WorldCell.prototype.addChild = function(child) {
  * @param PIXI.DisplayObjectContainer parent
  */
 BLOK.WorldCell.prototype.addTo = function(parent) {
-	if(!this.rendered) this.render();
+	//if(!this.rendered) this.render();
 
 	this.sprite.i = this.i;
 	this.sprite.j = this.j;
@@ -98,8 +99,12 @@ BLOK.WorldCell.prototype.render = function(child) {
 	var __worldCell = this;
 
 	jobQueue.add(function() {
+		var start = new Date().getTime();
+		console.log('start',__worldCell.i,__worldCell.j);
 		__worldCell.renderer.render(__worldCell.container);
 		__worldCell.rendered = true;
+		var elapsed = new Date().getTime() - start;
+		console.log('end',__worldCell.i,__worldCell.j,elapsed);
  	});
 };
 
