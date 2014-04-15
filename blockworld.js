@@ -1,50 +1,48 @@
-const WORLD_W = 128;
-const WORLD_H = 128;
+var WORLD_W = 128;
+var WORLD_H = 128;
+
+var BLOK = {};
 
 /**
- * Initialise PIXI: renderer, stage, and worldLayer
+ * Implements an 8x8 grouping of tiles, use to speed up rendering
+ * @param int i x-axis index of the cell
+ * @param int j y-axis index of the cell
  */
+BLOK.WorldCell = function(i,j) {
+	this.container = new PIXI.DisplayObjectContainer();
+	this.i = i;
+	this.j = j;
+};
 
-// create an new instance of a pixi stage
-var stage = new PIXI.Stage(0x333333);
+/**
+ * Add a child element (e.g. a tile) to this cell
+ * @param PIXI.DisplayObject child
+ */
+BLOK.WorldCell.prototype.addChild = function(child) {
+	this.container.addChild(child);
+};
 
-// create a renderer instance.
-var renderer = PIXI.autoDetectRenderer(window.innerWidth,window.innerHeight);
-document.body.appendChild(renderer.view);
+/**
+ * Load this cell into a parent object, for rendering
+ * @param PIXI.DisplayObjectContainer parent
+ */
+BLOK.WorldCell.prototype.addTo = function(parent) {
+	this.container.i = this.i;
+	this.container.j = this.j;
+	parent.addChild(this.container);
+};
 
-window.onresize = function() {
-	renderer.resize(window.innerWidth,window.innerHeight);
-	loadCells(worldLayer, renderer);
-}
+/**
+ * Returns true ift his WorldCell is already contained by the given parent
+ * @param  PIXI.DisplayObjectContainer parent
+ * @return Boolean
+ */
+BLOK.WorldCell.prototype.isContainedBy = function(parent) {
+	return (parent.children.indexOf(this.container) != -1);
+};
 
-var worldLayer = new PIXI.DisplayObjectContainer();
+BLOK.WorldCell.prototype.constructor = BLOK.WorldCell;
 
-stage.addChild(worldLayer);
-var scale = 1.0;
-//worldLayer.scale = new PIXI.Point(0.25,0.25);
-
-// Initialize world cells: 2d array of 8x8 cells
-var worldCells = initCells(WORLD_W/8, WORLD_H/8);
-
-// Initialize ground
-for(var i=0;i<WORLD_W;i++) {
-	for(var j=0;j<WORLD_H;j++) {
-		worldCells.addChild(tile(i,j));
-	}
-}
-loadCells(worldLayer, renderer);
-
-// Animation loop
-requestAnimFrame(animate);
-function animate() {
-//	scale = scale * 0.9;
-//	worldLayer.scale = new PIXI.Point(scale,scale);
-//	loadCells(worldLayer);
-    requestAnimFrame(animate);
-    if(renderer) renderer.render(stage);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Initialise a w x h array of world cells.
@@ -57,9 +55,7 @@ function initCells(w,h) {
 	for(var i=0;i<w;i++) {
 		worldCells[i] = [];
 		for(var j=0;j<h;j++) {
-			worldCells[i][j] = new PIXI.DisplayObjectContainer();
-			worldCells[i][j].i = i;
-			worldCells[i][j].j = j;
+			worldCells[i][j] = new BLOK.WorldCell(i,j);
 		}
 	}
 
@@ -120,21 +116,69 @@ function loadCells(worldLayer, renderer) {
 
 	if(typeof worldLayer.cellsLoaded == "string" && worldLayer.cellsLoaded == cellsLoaded) return;
 
-	for(var i = worldLayer.children.length-1; i >= 0; i--) {
-		var child = worldLayer.children[i];
+	var i,j,child;
+
+	for(i = worldLayer.children.length-1; i >= 0; i--) {
+		child = worldLayer.children[i];
 		if(child.i < minI || child.i > maxI || child.j < minJ || child.j > maxJ) {
 			worldLayer.removeChild(child);
 		}
 	}
-	for(var i=minI;i<=maxI;i++) {
-		for(var j=minJ;j<=maxJ;j++) {
-			if(worldLayer.children.indexOf(worldCells[i][j]) == -1) {
-				worldLayer.addChild(worldCells[i][j]);
+	for(i=minI;i<=maxI;i++) {
+		for(j=minJ;j<=maxJ;j++) {
+			if(!worldCells[i][j].isContainedBy(worldLayer)) {
+				worldCells[i][j].addTo(worldLayer);
 			}
 		}
 	}
 
 	worldLayer.cellsLoaded = cellsLoaded;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Initialise PIXI: renderer, stage, and worldLayer
+ */
+
+// create an new instance of a pixi stage
+var stage = new PIXI.Stage(0x333333);
+
+// create a renderer instance.
+var renderer = PIXI.autoDetectRenderer(window.innerWidth,window.innerHeight);
+document.body.appendChild(renderer.view);
+
+window.onresize = function() {
+	renderer.resize(window.innerWidth,window.innerHeight);
+	loadCells(worldLayer, renderer);
+};
+
+var worldLayer = new PIXI.DisplayObjectContainer();
+
+stage.addChild(worldLayer);
+var scale = 1.0;
+//worldLayer.scale = new PIXI.Point(0.25,0.25);
+
+// Initialize world cells: 2d array of 8x8 cells
+var worldCells = initCells(WORLD_W/8, WORLD_H/8);
+
+// Initialize ground
+for(var i=0;i<WORLD_W;i++) {
+	for(var j=0;j<WORLD_H;j++) {
+		worldCells.addChild(tile(i,j));
+	}
+}
+loadCells(worldLayer, renderer);
+
+// Animation loop
+requestAnimFrame(animate);
+function animate() {
+//	scale = scale * 0.9;
+//	worldLayer.scale = new PIXI.Point(scale,scale);
+//	loadCells(worldLayer);
+    requestAnimFrame(animate);
+    if(renderer) renderer.render(stage);
 }
 
 // Support for dragging
