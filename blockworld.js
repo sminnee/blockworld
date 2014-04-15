@@ -6,6 +6,41 @@ var CELL_SIZE = 8;
 var BLOK = {};
 
 /**
+ * Implements a simple job queue.  Used for renders
+ * @type {Object}
+ */
+jobQueue = {
+	queue: [],
+	running: false,
+	add: function(job) {
+		jobQueue.queue.push(job);
+		if(!jobQueue.running) {
+			jobQueue.running = true;
+			jobQueue.delayedRun();
+		}
+	},
+
+	delayedRun: function() {
+		setTimeout(function() {
+			jobQueue.run();
+		}, 200);
+	},
+
+	run: function() {
+		if(!jobQueue.queue.length) return;
+		jobQueue.running = true;
+
+		var job = jobQueue.queue[0];
+		jobQueue.queue.shift();
+
+		job();
+
+		if(jobQueue.queue.length) jobQueue.delayedRun();
+		else jobQueue.running = false;
+	}
+};
+
+/**
  * Implements an 8x8 grouping of tiles, use to speed up rendering
  * @param int i x-axis index of the cell
  * @param int j y-axis index of the cell
@@ -61,8 +96,12 @@ BLOK.WorldCell.prototype.isContainedBy = function(parent) {
  * @param PIXI.DisplayObject child
  */
 BLOK.WorldCell.prototype.render = function(child) {
-	this.renderer.render(this.container);
-	this.rendered = true;
+	var __worldCell = this;
+
+	jobQueue.add(function() {
+		__worldCell.renderer.render(__worldCell.container);
+		__worldCell.rendered = true;
+ 	});
 };
 
 BLOK.WorldCell.prototype.constructor = BLOK.WorldCell;
@@ -88,6 +127,17 @@ function initCells(w,h) {
 		var cellI = Math.floor(tile.i/CELL_SIZE);
 		var cellJ = Math.floor(tile.j/CELL_SIZE);
 		this[cellI][cellJ].addChild(tile);
+	};
+
+	worldCells.render = function() {
+		var start = new Date().getTime();
+
+		for(var i=0;i<this.length;i++) {
+			for(var j=0;j<this[i].length;j++) {
+				this[i][j].render();
+			}
+		}
+		var elapsed = new Date().getTime() - start;
 	};
 
 	return worldCells;
@@ -186,11 +236,15 @@ for(var i=0;i<WORLD_W;i++) {
 		worldCells.addChild(tile(i,j));
 	}
 }
+
+worldCells.render();
+
 loadCells(worldLayer, renderer);
 
 // Animation loop
 requestAnimFrame(animate);
 function animate() {
+
 //	scale = scale * 0.9;
 //	worldLayer.scale = new PIXI.Point(scale,scale);
 //	loadCells(worldLayer);
@@ -232,4 +286,4 @@ window.onkeydown = function(e) {
 			break;
 
 	}
-}
+};
