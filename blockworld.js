@@ -1,9 +1,12 @@
-var WORLD_W = 128;
-var WORLD_H = 128;
+var WORLD_W = 256;
+var WORLD_H = 256;
 
 var CELL_SIZE = 8;
 
 var BLOK = {};
+
+
+var grass = PIXI.Texture.fromImage('grass.png');
 
 /**
  * Implements a simple job queue.  Used for renders
@@ -23,7 +26,7 @@ jobQueue = {
 	delayedRun: function() {
 		setTimeout(function() {
 			jobQueue.run();
-		}, 200);
+		}, 10);
 	},
 
 	run: function() {
@@ -46,7 +49,8 @@ jobQueue = {
  * @param int j y-axis index of the cell
  */
 BLOK.WorldCell = function(i,j) {
-	this.container = new PIXI.DisplayObjectContainer();
+	this.tiles = [];
+	this.container = null;
 	this.renderer = new PIXI.RenderTexture(CELL_SIZE*40, CELL_SIZE*40);
 	this.sprite = new PIXI.Sprite(this.renderer);
 	this.sprite.x = i*40*CELL_SIZE;
@@ -57,6 +61,16 @@ BLOK.WorldCell = function(i,j) {
 	this.j = j;
 };
 
+BLOK.WorldCell.prototype.getContainer = function() {
+	if(this.container == null) {
+		this.container = new PIXI.DisplayObjectContainer();	
+		for(var i=0;i<this.tiles.length;i++) {
+			this.container.addChild(this.tiles[i].getDisplayObject());
+		}
+	}
+	return this.container;
+}
+
 /**
  * Add a child element (e.g. a tile) to this cell
  * @param PIXI.DisplayObject child
@@ -64,9 +78,14 @@ BLOK.WorldCell = function(i,j) {
 BLOK.WorldCell.prototype.addChild = function(child) {
 	var offsetI = child.i - this.i*CELL_SIZE;
 	var offsetJ = child.j - this.j*CELL_SIZE;
-	child.x = offsetI * 40 + 20;
-	child.y = offsetJ * 40 + 20;
-	this.container.addChild(child);
+	
+	child.setPosition(offsetI * 40, offsetJ * 40);
+	this.tiles.push(child);
+
+	if(this.container != null) {
+		this.container.addChild(this.tiles[i].getDisplayObject());
+	}
+
 	this.rendered = false;
 };
 
@@ -99,16 +118,42 @@ BLOK.WorldCell.prototype.render = function(child) {
 	var __worldCell = this;
 
 	jobQueue.add(function() {
-		var start = new Date().getTime();
-		console.log('start',__worldCell.i,__worldCell.j);
-		__worldCell.renderer.render(__worldCell.container);
+		__worldCell.renderer.render(__worldCell.getContainer());
 		__worldCell.rendered = true;
-		var elapsed = new Date().getTime() - start;
-		console.log('end',__worldCell.i,__worldCell.j,elapsed);
  	});
 };
 
 BLOK.WorldCell.prototype.constructor = BLOK.WorldCell;
+
+
+BLOK.Tile = function(i,j) {
+	this.i = i;
+	this.j = j;
+	this.x = 0;
+	this.y = 0;
+	this.displayObject = null;
+}
+BLOK.Tile.prototype.constructor = BLOK.Tile;
+
+BLOK.Tile.prototype.setPosition = function(x,y) {
+	this.x = x;
+	this.y = y;
+	if(this.displayObject != null) {
+		this.displayObject.x = this.x;
+		this.displayObject.x = this.y;
+	}
+}
+
+BLOK.Tile.prototype.getDisplayObject = function() {
+	if(this.displayObject == null) {
+		this.displayObject = new PIXI.Sprite(grass); 
+		this.displayObject.x = this.x;
+		this.displayObject.y = this.y;
+		this.displayObject.i = this.i;
+		this.displayObject.j = this.j;
+	}
+	return this.displayObject;
+}
 
 
 /**
@@ -154,13 +199,14 @@ var tileColours = [ 0x007700, 0x000077, 0x770000, 0x007777 ];
  * i,j: The location on the tile grid where this tile appears
  */
 function tile(i, j) {
+	// Graphic sprites are much faster
+	var graphics = new PIXI.Sprite(grass); 
+	/*
 	var graphics = new PIXI.Graphics();
 
 	graphics.beginFill(tileColours[Math.floor(Math.random()*tileColours.length)]);
 	graphics.drawRect(-18,-18,36,36);
 	graphics.endFill();
-	graphics.i = i;
-	graphics.j = j;
 
 	graphics.hitArea = new PIXI.Rectangle(-20, -20, 40, 40);
 	graphics.interactive = true;
@@ -171,6 +217,10 @@ function tile(i, j) {
 		this.drawRect(-18,-18,36,36);
 		this.endFill();
 	};
+	*/
+
+	graphics.i = i;
+	graphics.j = j;
 
 	return graphics;
 }
@@ -240,7 +290,7 @@ var worldCells = initCells(WORLD_W/CELL_SIZE, WORLD_H/CELL_SIZE);
 // Initialize ground
 for(var i=0;i<WORLD_W;i++) {
 	for(var j=0;j<WORLD_H;j++) {
-		worldCells.addChild(tile(i,j));
+		worldCells.addChild(new BLOK.Tile(i,j));
 	}
 }
 
