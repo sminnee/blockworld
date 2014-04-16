@@ -62,14 +62,14 @@ BLOK.WorldCell = function(i,j) {
 };
 
 BLOK.WorldCell.prototype.getContainer = function() {
-	if(this.container == null) {
-		this.container = new PIXI.DisplayObjectContainer();	
+	if(this.container === null) {
+		this.container = new PIXI.DisplayObjectContainer();
 		for(var i=0;i<this.tiles.length;i++) {
 			this.container.addChild(this.tiles[i].getDisplayObject());
 		}
 	}
 	return this.container;
-}
+};
 
 /**
  * Add a child element (e.g. a tile) to this cell
@@ -82,7 +82,7 @@ BLOK.WorldCell.prototype.addChild = function(child) {
 	child.setPosition(offsetI * 40, offsetJ * 40);
 	this.tiles.push(child);
 
-	if(this.container != null) {
+	if(this.container !== null) {
 		this.container.addChild(this.tiles[i].getDisplayObject());
 	}
 
@@ -120,7 +120,7 @@ BLOK.WorldCell.prototype.render = function(child) {
 	jobQueue.add(function() {
 		__worldCell.renderer.render(__worldCell.getContainer());
 		__worldCell.rendered = true;
- 	});
+	});
 };
 
 BLOK.WorldCell.prototype.constructor = BLOK.WorldCell;
@@ -132,28 +132,29 @@ BLOK.Tile = function(i,j) {
 	this.x = 0;
 	this.y = 0;
 	this.displayObject = null;
-}
+};
+
 BLOK.Tile.prototype.constructor = BLOK.Tile;
 
 BLOK.Tile.prototype.setPosition = function(x,y) {
 	this.x = x;
 	this.y = y;
-	if(this.displayObject != null) {
+	if(this.displayObject !== null) {
 		this.displayObject.x = this.x;
 		this.displayObject.x = this.y;
 	}
-}
+};
 
 BLOK.Tile.prototype.getDisplayObject = function() {
-	if(this.displayObject == null) {
-		this.displayObject = new PIXI.Sprite(grass); 
+	if(this.displayObject === null) {
+		this.displayObject = new PIXI.Sprite(grass);
 		this.displayObject.x = this.x;
 		this.displayObject.y = this.y;
 		this.displayObject.i = this.i;
 		this.displayObject.j = this.j;
 	}
 	return this.displayObject;
-}
+};
 
 
 /**
@@ -200,7 +201,7 @@ var tileColours = [ 0x007700, 0x000077, 0x770000, 0x007777 ];
  */
 function tile(i, j) {
 	// Graphic sprites are much faster
-	var graphics = new PIXI.Sprite(grass); 
+	var graphics = new PIXI.Sprite(grass);
 	/*
 	var graphics = new PIXI.Graphics();
 
