@@ -3,10 +3,61 @@ var WORLD_H = 256;
 
 var CELL_SIZE = 8;
 
+// Directional constants used to look up results from getNeighboursFrom()
+var DIR_TL = 0;
+var DIR_TOP = 1;
+var DIR_TR = 2;
+var DIR_RIGHT = 3;
+var DIR_BR = 4;
+var DIR_BOTTOM = 5;
+var DIR_BL = 6;
+var DIR_LEFT = 7;
+
 var BLOK = {};
 
+	var tileLookup = {
+		grass: [
+								//TRBL - 0=diff, 1=same
+			null, //'grass',			//0000 - currently b0kred looking
+			null, //'grass',			//0001 - currently b0kred looking
+			null, //'grass',			//0010 - currently b0kred looking
+			'grass-tr-rock',	//0011
+			null, //'grass',			//0100 - currently b0kred looking
+			null, //'rock-bottom-grass',//0101 - currently b0kred looking
+			'grass-tl-rock',	//0110
+			'rock-bottom-grass',//0111
+			null, //'grass',			//1000 - currently b0kred looking
+			'grass-br-rock',	//1001
+			null, //'rock-left-grass',	//1010 - currently b0kred looking
+			'rock-left-grass',	//1011
+			'rock-tr-grass',	//1100
+			'rock-top-grass',	//1101
+			'rock-right-grass',	//1110
+			'grass',			//1111
+		],
+	};
 
-var grass = PIXI.Texture.fromImage('grass.png');
+
+
+BLOK.textures = {
+	'grass' : PIXI.Texture.fromImage('img/grass.png'),
+	'rock' : PIXI.Texture.fromImage('img/rock.png'),
+
+	'grass-bl-rock' : PIXI.Texture.fromImage('img/grass-bl-rock.png'),
+	'grass-br-rock' : PIXI.Texture.fromImage('img/grass-br-rock.png'),
+	'grass-tl-rock' : PIXI.Texture.fromImage('img/grass-tl-rock.png'),
+	'grass-tr-rock' : PIXI.Texture.fromImage('img/grass-tr-rock.png'),
+
+	'rock-bl-grass' : PIXI.Texture.fromImage('img/rock-bl-grass.png'),
+	'rock-br-grass' : PIXI.Texture.fromImage('img/rock-br-grass.png'),
+	'rock-tl-grass' : PIXI.Texture.fromImage('img/rock-tl-grass.png'),
+	'rock-tr-grass' : PIXI.Texture.fromImage('img/rock-tr-grass.png'),
+
+	'rock-bottom-grass' : PIXI.Texture.fromImage('img/rock-bottom-grass.png'),
+	'rock-left-grass' : PIXI.Texture.fromImage('img/rock-left-grass.png'),
+	'rock-top-grass' : PIXI.Texture.fromImage('img/rock-top-grass.png'),
+	'rock-right-grass' : PIXI.Texture.fromImage('img/rock-right-grass.png')
+};
 
 /**
  * Implements a simple job queue.  Used for renders
@@ -55,7 +106,7 @@ BLOK.WorldCell = function(i,j) {
 	this.sprite = new PIXI.Sprite(this.renderer);
 	this.sprite.x = i*40*CELL_SIZE;
 	this.sprite.y = j*40*CELL_SIZE;
-	if((i+j) % 2) this.sprite.tint = 0xAAAAAA;
+	//if((i+j) % 2) this.sprite.tint = 0xAAAAAA;
 	this.rendered = false;
 	this.i = i;
 	this.j = j;
@@ -126,7 +177,8 @@ BLOK.WorldCell.prototype.render = function(child) {
 BLOK.WorldCell.prototype.constructor = BLOK.WorldCell;
 
 
-BLOK.Tile = function(i,j) {
+BLOK.Tile = function(i,j, type) {
+	this.type = (type == 'grass') ? 'grass' : 'rock';
 	this.i = i;
 	this.j = j;
 	this.x = 0;
@@ -146,8 +198,17 @@ BLOK.Tile.prototype.setPosition = function(x,y) {
 };
 
 BLOK.Tile.prototype.getDisplayObject = function() {
+	var textureName = null;
+	if(this.type == 'grass') {
+		var neighbours = this.getNeighboursFrom(worldCells);
+		var textureName = this.getTextureNameFrom(neighbours);
+		if(textureName === null) textureName = this.type;
+	} else {
+		textureName = this.type;
+	}
+
 	if(this.displayObject === null) {
-		this.displayObject = new PIXI.Sprite(grass);
+		this.displayObject = new PIXI.Sprite(BLOK.textures[textureName]);
 		this.displayObject.x = this.x;
 		this.displayObject.y = this.y;
 		this.displayObject.i = this.i;
@@ -156,6 +217,37 @@ BLOK.Tile.prototype.getDisplayObject = function() {
 	return this.displayObject;
 };
 
+/**
+ * Given a WorldCells object, return an array of this cell's neighbours
+ * Clockwise from top-left
+ */
+BLOK.Tile.prototype.getNeighboursFrom = function(worldCells) {
+	return [
+		worldCells.getCell(this.i-1,this.j-1), // 0: top-left
+		worldCells.getCell(this.i,this.j-1),   // 1: top
+		worldCells.getCell(this.i+1,this.j-1), // 2: top-right
+		worldCells.getCell(this.i+1,this.j),   // 3; right
+		worldCells.getCell(this.i+1,this.j+1), // 4: bottom-right
+		worldCells.getCell(this.i,this.j+1),   // 5: bottom
+		worldCells.getCell(this.i-1,this.j), // 6: bottom-left
+		worldCells.getCell(this.i-1,this.j),   // 7: left
+	];
+};
+
+/**
+ * Return the texture name, given an array of neighbours
+ * @param  {[type]} neighbours [description]
+ * @return {[type]}            [description]
+ */
+BLOK.Tile.prototype.getTextureNameFrom = function(neighbours) {
+	var lookupIdx = 0;
+	if(!neighbours[DIR_TOP] || neighbours[DIR_TOP].type == this.type) lookupIdx += 8;
+	if(!neighbours[DIR_RIGHT] || neighbours[DIR_RIGHT].type == this.type) lookupIdx += 4;
+	if(!neighbours[DIR_BOTTOM] || neighbours[DIR_BOTTOM].type == this.type) lookupIdx += 2;
+	if(!neighbours[DIR_LEFT] || neighbours[DIR_LEFT].type == this.type) lookupIdx += 1;
+
+	return tileLookup[this.type][lookupIdx]; 
+};
 
 /**
  * Initialise a w x h array of world cells.
@@ -172,11 +264,16 @@ function initCells(w,h) {
 		}
 	}
 
+	worldCells.allTiles = [];
+
 	// Funciton to add a tile
 	worldCells.addChild = function(tile) {
 		var cellI = Math.floor(tile.i/CELL_SIZE);
 		var cellJ = Math.floor(tile.j/CELL_SIZE);
 		this[cellI][cellJ].addChild(tile);
+
+		if(!this.allTiles[tile.i]) this.allTiles[tile.i] = [];
+		this.allTiles[tile.i][tile.j] = tile;
 	};
 
 	worldCells.render = function() {
@@ -190,40 +287,24 @@ function initCells(w,h) {
 		var elapsed = new Date().getTime() - start;
 	};
 
-	return worldCells;
-}
-
-var tileColours = [ 0x007700, 0x000077, 0x770000, 0x007777 ];
-
-/**
- * Generate a single tile as a PIXI object
- * i,j: The location on the tile grid where this tile appears
- */
-function tile(i, j) {
-	// Graphic sprites are much faster
-	var graphics = new PIXI.Sprite(grass);
-	/*
-	var graphics = new PIXI.Graphics();
-
-	graphics.beginFill(tileColours[Math.floor(Math.random()*tileColours.length)]);
-	graphics.drawRect(-18,-18,36,36);
-	graphics.endFill();
-
-	graphics.hitArea = new PIXI.Rectangle(-20, -20, 40, 40);
-	graphics.interactive = true;
-	graphics.buttonMode = true;
-
-	graphics.click = function() {
-		this.beginFill(0x0000FF);
-		this.drawRect(-18,-18,36,36);
-		this.endFill();
+	worldCells.getCell = function(i,j) {
+		if(this.allTiles[i]) return this.allTiles[i][j];
+		else return null;
 	};
-	*/
 
-	graphics.i = i;
-	graphics.j = j;
+	worldCells.allByType = function(type) {
+		var i,j,accumulator = [];
+		for(i=0;i<this.allTiles.length;i++) {
+			for(j=0;j<this.allTiles[i].length;j++) {
+				if(this.allTiles[i][j].type == type) {
+					accumulator.push(this.allTiles[i][j]);
+				}
+			}
+		}
+		return accumulator;
+	};
 
-	return graphics;
+	return worldCells;
 }
 
 /**
@@ -282,16 +363,55 @@ window.onresize = function() {
 };
 
 var worldLayer = new PIXI.DisplayObjectContainer();
+worldLayer.targetScale = null;
 
 stage.addChild(worldLayer);
 
 // Initialize world cells: 2d array of CELL_SIZExCELL_SIZE cells
 var worldCells = initCells(WORLD_W/CELL_SIZE, WORLD_H/CELL_SIZE);
+var i,j,c;
 
-// Initialize ground
-for(var i=0;i<WORLD_W;i++) {
-	for(var j=0;j<WORLD_H;j++) {
-		worldCells.addChild(new BLOK.Tile(i,j));
+// Initialize ground - scattering a few rocks
+for(i=0;i<WORLD_W;i++) {
+	for(j=0;j<WORLD_H;j++) {
+		worldCells.addChild(new BLOK.Tile(i,j, Math.random()>0.95? 'rock':'grass'));
+	}
+}
+
+growCellsInMap('rock',0.5);
+//growCellsInMap('grass',0.3);
+growCellsInMap('rock',0.3);
+
+fixGrassCells();
+fixGrassCells();
+fixGrassCells();
+fixGrassCells();
+fixGrassCells();
+
+function growCellsInMap(type, likelihood) {
+	// Grow those rocks into bigger clusters
+	var rocks = worldCells.allByType(type), neighbours;
+
+	for(i=0;i<rocks.length;i++) {
+		neighbours = rocks[i].getNeighboursFrom(worldCells);
+		for(j=0;j<neighbours.length;j++) {
+			if(neighbours[j] && neighbours[j].type != type && Math.random()<likelihood) neighbours[j].type = type;
+		}
+	}
+}
+
+function fixGrassCells(type, likelihood) {
+	var grasses = worldCells.allByType('grass'), neighbours, dir;
+	for(i=0;i<grasses.length;i++) {
+		neighbours = grasses[i].getNeighboursFrom(worldCells);
+
+		// Bad cell
+		while(grasses[i].getTextureNameFrom(neighbours) === null) {
+			// Choose DIR_TOP, DIR_RIGHT, DIR_BOTTOM, or DIR_LEFT
+			dir = Math.floor(Math.random() * 4)*2+1;
+			// Make it grass
+			if(neighbours[dir]) neighbours[dir].type = 'grass';
+		}
 	}
 }
 
