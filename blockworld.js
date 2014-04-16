@@ -303,9 +303,8 @@ loadCells(worldLayer, renderer);
 requestAnimFrame(animate);
 function animate() {
 
-//	scale = scale * 0.9;
-//	worldLayer.scale = new PIXI.Point(scale,scale);
-//	loadCells(worldLayer);
+	scaleAsNeeded();
+
     requestAnimFrame(animate);
     if(renderer) renderer.render(stage);
 }
@@ -330,18 +329,50 @@ stage.mousemove = function() {
 };
 
 window.onkeydown = function(e) {
+	var scaleFactor = null;
 	switch(e.keyCode) {
 		// +
 		case 187:
-			worldLayer.scale = new PIXI.Point(worldLayer.scale.x*1.5,worldLayer.scale.y*1.5);
-			loadCells(worldLayer, renderer);
+			if(worldLayer.targetScale !== null) {
+				worldLayer.targetScale = worldLayer.targetScale * 2;
+			} else {
+				worldLayer.targetScale = worldLayer.scale.x * 2;
+			}
 			break;
 
 		// -
 		case 189:
-			worldLayer.scale = new PIXI.Point(worldLayer.scale.x/1.5,worldLayer.scale.y/1.5);
-			loadCells(worldLayer, renderer);
+			if(worldLayer.targetScale !== null) {
+				worldLayer.targetScale = worldLayer.targetScale / 2;
+			} else {
+				worldLayer.targetScale = worldLayer.scale.x / 2;
+			}
 			break;
 
 	}
 };
+
+function scaleAsNeeded() {
+	if(worldLayer.targetScale !== null) {
+		var newScale;
+
+		if(worldLayer.scale.x < worldLayer.targetScale) {
+			newScale = Math.min(worldLayer.targetScale, worldLayer.scale.x*1.05);
+		} else {
+			newScale = Math.max(worldLayer.targetScale, worldLayer.scale.x/1.05);
+		}
+
+		scaleFactor = newScale/worldLayer.scale.x;
+
+		worldLayer.scale = new PIXI.Point(newScale, newScale);
+
+		// Maintain the centre point. Adjustment is a derivation of
+		// (w - 2x) / 2 * scale) == (w - 2(x-adj)) / (2 * scale * scaleFactor)
+		worldLayer.x -= ((scaleFactor-1) * renderer.width/2) + (1-scaleFactor)*worldLayer.x;
+		worldLayer.y -= ((scaleFactor-1) * renderer.height/2) + (1-scaleFactor)*worldLayer.y;
+
+		loadCells(worldLayer, renderer);
+
+		if(newScale == worldLayer.targetScale) worldLayer.targetScale = null;
+	}
+}
