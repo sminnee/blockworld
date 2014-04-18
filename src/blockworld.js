@@ -35,8 +35,6 @@ var tileLookup = {
 	],
 };
 
-var worldCells;
-
 require.config({
     paths: {
     	"pixijs": "../bower_components/pixi.js/bin/pixi"
@@ -45,10 +43,13 @@ require.config({
 
 require([
 	"pixijs",
+	"src/WorldGenerator.js",
+	"src/ViewManager.js",
+	"src/ViewRenderer.js",
 	"src/Tile.js",
 	"src/WorldCell.js",
 	"src/Agent.js"
-], function(PIXI, Tile, WorldCell, Agent) {
+], function(PIXI, WorldGenerator, ViewManager, ViewRenderer, Tile, WorldCell, Agent) {
 
 /**
  * Implements a simple job queue.  Used for renders
@@ -85,281 +86,56 @@ jobQueue = {
 	}
 };
 
-
-
-/**
- * Initialise a w x h array of world cells.
- * The world elements are grouped into cells (each a PIXI.DisplayObjectContainer), which each
- * define an CELL_SIZExCELL_SIZE area of the map. The cells are loaded to/from display memory (i.e., the worldLayer),
- * to ensure that rendering is quick when opening large maps.
- */
-function initCells(w,h) {
-	var worldCells = [];
-	for(var i=0;i<w;i++) {
-		worldCells[i] = [];
-		for(var j=0;j<h;j++) {
-			worldCells[i][j] = new WorldCell(i,j);
-		}
-	}
-
-	worldCells.allTiles = [];
-
-	// Funciton to add a tile
-	worldCells.addChild = function(tile) {
-		var cellI = Math.floor(tile.i/CELL_SIZE);
-		var cellJ = Math.floor(tile.j/CELL_SIZE);
-		this[cellI][cellJ].addChild(tile);
-
-		if(!this.allTiles[tile.i]) this.allTiles[tile.i] = [];
-		this.allTiles[tile.i][tile.j] = tile;
-	};
-
-	worldCells.render = function() {
-		var start = new Date().getTime();
-
-		for(var i=0;i<this.length;i++) {
-			for(var j=0;j<this[i].length;j++) {
-				this[i][j].render();
-			}
-		}
-		var elapsed = new Date().getTime() - start;
-	};
-
-	worldCells.getCell = function(i,j) {
-		if(this.allTiles[i]) return this.allTiles[i][j];
-		else return null;
-	};
-
-	worldCells.allByType = function(type) {
-		var i,j,accumulator = [];
-		for(i=0;i<this.allTiles.length;i++) {
-			for(j=0;j<this.allTiles[i].length;j++) {
-				if(this.allTiles[i][j].type == type) {
-					accumulator.push(this.allTiles[i][j]);
-				}
-			}
-		}
-		return accumulator;
-	};
-
-	return worldCells;
-}
-
-/**
- * Load the cells into the worldLayer that would currently be visible
- */
-function loadCells(worldLayer, terrainLayer, renderer) {
-	var scale = worldLayer.scale.x; // assume x==y
-	var x = -worldLayer.x / scale;
-	var y = -worldLayer.y / scale;
-
-	var minI = Math.max(0,Math.floor(x/40/CELL_SIZE));
-	var minJ = Math.max(0,Math.floor(y/40/CELL_SIZE));
-	var maxI = Math.min(WORLD_W/CELL_SIZE-1, minI + Math.ceil((renderer.width/40)/scale/CELL_SIZE));
-	var maxJ = Math.min(WORLD_H/CELL_SIZE-1, minJ + Math.ceil((renderer.height/40)/scale/CELL_SIZE));
-
-	var cellsLoaded = minI+','+minJ+','+maxI+','+maxJ;
-
-	if(typeof terrainLayer.cellsLoaded == "string" && terrainLayer.cellsLoaded == cellsLoaded) return;
-
-	var i,j,child;
-
-	for(i = terrainLayer.children.length-1; i >= 0; i--) {
-		child = terrainLayer.children[i];
-		if(child.i < minI || child.i > maxI || child.j < minJ || child.j > maxJ) {
-			terrainLayer.removeChild(child);
-		}
-	}
-	for(i=minI;i<=maxI;i++) {
-		for(j=minJ;j<=maxJ;j++) {
-			if(!worldCells[i][j].isContainedBy(terrainLayer)) {
-				worldCells[i][j].addTo(terrainLayer);
-			}
-		}
-	}
-
-	terrainLayer.cellsLoaded = cellsLoaded;
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Initialise PIXI: renderer, stage, and worldLayer
- */
 
-// create an new instance of a pixi stage
-var stage = new PIXI.Stage(0x333333);
+	/// Generate a random work
+	var world = WorldGenerator.generate(WORLD_W, WORLD_H, 10000);
 
-// create a renderer instance.
-var renderer = PIXI.autoDetectRenderer(window.innerWidth,window.innerHeight);
-document.body.appendChild(renderer.view);
+	// Create a renderer to display it
+	var viewRenderer = new ViewRenderer();
 
-window.onresize = function() {
-	renderer.resize(window.innerWidth,window.innerHeight);
-	loadCells(worldLayer, terrainLayer, renderer);
-};
+	// Link a terrain layer to the world's tileset
+	var terrainLayer = new PIXI.DisplayObjectContainer();
+	viewRenderer.getWorldLayer().addChild(terrainLayer);
+	viewRenderer.renderOnDemand(world.getTileset(), terrainLayer);
 
-var worldLayer = new PIXI.DisplayObjectContainer();
-var terrainLayer = new PIXI.DisplayObjectContainer();
-worldLayer.targetScale = null;
+	// Create a view managaer to navigate the rendered world
+	var viewManager = new ViewManager(viewRenderer, viewRenderer.getWorldLayer());
 
-worldLayer.addChild(terrainLayer);
-stage.addChild(worldLayer);
+	var loader = new PIXI.AssetLoader([
+		"img/animal-sprites.json",
+		"img/grass-rock.json",
+	]);
 
-// Initialize world cells: 2d array of CELL_SIZExCELL_SIZE cells
-worldCells = initCells(WORLD_W/CELL_SIZE, WORLD_H/CELL_SIZE);
-var i,j,c;
+	loader.onComplete = function() {
+		world.getTileset().render();
 
-// Initialize ground - scattering a few rocks
-for(i=0;i<WORLD_W;i++) {
-	for(j=0;j<WORLD_H;j++) {
-		worldCells.addChild(new Tile(i,j, Math.random()>0.95? 'rock':'grass'));
+		world.agents.forEach(function(agent) {
+			viewRenderer.getWorldLayer().addChild(agent.getSprite());
+		});
+
+		viewRenderer.viewportChanged();
+	};
+
+	loader.load();
+
+	/**
+	 * Initialise PIXI: renderer, stage, and worldLayer
+	 */
+
+
+	// Game loop
+	requestAnimFrame(animate);
+	function animate(time) {
+		viewManager.tick();
+
+		world.tick();
+
+		viewRenderer.render();
+
+	    requestAnimFrame(animate);
 	}
-}
 
-growCellsInMap('rock',0.5);
-//growCellsInMap('grass',0.3);
-growCellsInMap('rock',0.3);
-
-fixGrassCells();
-fixGrassCells();
-fixGrassCells();
-fixGrassCells();
-fixGrassCells();
-
-function growCellsInMap(type, likelihood) {
-	// Grow those rocks into bigger clusters
-	var rocks = worldCells.allByType(type), neighbours;
-
-	for(i=0;i<rocks.length;i++) {
-		neighbours = rocks[i].getNeighboursFrom(worldCells);
-		for(j=0;j<neighbours.length;j++) {
-			if(neighbours[j] && neighbours[j].type != type && Math.random()<likelihood) neighbours[j].type = type;
-		}
-	}
-}
-
-function fixGrassCells(type, likelihood) {
-	var grasses = worldCells.allByType('grass'), neighbours, dir;
-	for(i=0;i<grasses.length;i++) {
-		neighbours = grasses[i].getNeighboursFrom(worldCells);
-
-		// Bad cell
-		while(grasses[i].getTextureNameFrom(neighbours) === null) {
-			// Choose DIR_TOP, DIR_RIGHT, DIR_BOTTOM, or DIR_LEFT
-			dir = Math.floor(Math.random() * 4)*2+1;
-			// Make it grass
-			if(neighbours[dir]) neighbours[dir].type = 'grass';
-		}
-	}
-}
-
-var agents = [];
-
-var animals = ['dog','cat','chicken','sheep','cow','horse','wolf','butterfly'];
-
-for(i=0;i<10000;i++) {
-	agents.push(new Agent(
-		Math.floor(Math.random()*WORLD_W),
-		Math.floor(Math.random()*WORLD_H),
-		animals[Math.floor(Math.random()*animals.length)]
-	));
-}
-
-var loader = new PIXI.AssetLoader([
-	"img/animal-sprites.json",
-	"img/grass-rock.json",
-]);
-loader.onComplete = function() {
-	worldCells.render();
-	agents.forEach(function(agent) {
-		worldLayer.addChild(agent.getSprite());
-	});
-	loadCells(worldLayer, terrainLayer, renderer);
-};
-loader.load();
-
-
-// Animation loop
-requestAnimFrame(animate);
-function animate(time) {
-	scaleAsNeeded();
-
-	agents.forEach(function(agent) {
-		agent.tick(time);
-	});
-
-    if(renderer) renderer.render(stage);
-    requestAnimFrame(animate);
-}
-
-// Support for dragging
-stage.mousedown = function() {
-	var pos = this.getMousePosition();
-	this.dragOffset = { x: pos.x-worldLayer.x,y:pos.y-worldLayer.y } ;
-};
-
-stage.mouseup = function() {
-	this.dragOffset = null;
-};
-
-stage.mousemove = function() {
-	if(this.dragOffset) {
-		var point = this.getMousePosition();
-		worldLayer.x = point.x - this.dragOffset.x;
-		worldLayer.y = point.y - this.dragOffset.y;
-		loadCells(worldLayer, terrainLayer, renderer);
-	}
-};
-
-window.onkeydown = function(e) {
-	var scaleFactor = null;
-	switch(e.keyCode) {
-		// +
-		case 187:
-			if(worldLayer.targetScale !== null) {
-				worldLayer.targetScale = worldLayer.targetScale * 2;
-			} else {
-				worldLayer.targetScale = worldLayer.scale.x * 2;
-			}
-			break;
-
-		// -
-		case 189:
-			if(worldLayer.targetScale !== null) {
-				worldLayer.targetScale = worldLayer.targetScale / 2;
-			} else {
-				worldLayer.targetScale = worldLayer.scale.x / 2;
-			}
-			break;
-
-	}
-};
-
-function scaleAsNeeded() {
-	if(worldLayer.targetScale !== null) {
-		var newScale;
-
-		if(worldLayer.scale.x < worldLayer.targetScale) {
-			newScale = Math.min(worldLayer.targetScale, worldLayer.scale.x*1.05);
-		} else {
-			newScale = Math.max(worldLayer.targetScale, worldLayer.scale.x/1.05);
-		}
-
-		scaleFactor = newScale/worldLayer.scale.x;
-
-		worldLayer.scale = new PIXI.Point(newScale, newScale);
-
-		// Maintain the centre point. Adjustment is a derivation of
-		// (w - 2x) / 2 * scale) == (w - 2(x-adj)) / (2 * scale * scaleFactor)
-		worldLayer.x -= ((scaleFactor-1) * renderer.width/2) + (1-scaleFactor)*worldLayer.x;
-		worldLayer.y -= ((scaleFactor-1) * renderer.height/2) + (1-scaleFactor)*worldLayer.y;
-
-		loadCells(worldLayer, terrainLayer, renderer);
-
-		if(newScale == worldLayer.targetScale) worldLayer.targetScale = null;
-	}
-}
 
 });

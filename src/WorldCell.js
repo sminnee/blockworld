@@ -7,13 +7,12 @@ define([
 	 * @param int i x-axis index of the cell
 	 * @param int j y-axis index of the cell
 	 */
-	var WorldCell = function(i,j) {
+	var WorldCell = function(i,j,cellSize) {
 		this.tiles = [];
 		this.container = null;
-		this.renderer = new PIXI.RenderTexture(CELL_SIZE*40, CELL_SIZE*40);
-		this.sprite = new PIXI.Sprite(this.renderer);
-		this.sprite.x = i*40*CELL_SIZE;
-		this.sprite.y = j*40*CELL_SIZE;
+		this.cellSize = cellSize;
+		this.renderer = null;
+		this.sprite = null;
 		//if((i+j) % 2) this.sprite.tint = 0xAAAAAA;
 		this.rendered = false;
 		this.i = i;
@@ -32,13 +31,29 @@ define([
 		return this.container;
 	};
 
+	WorldCell.prototype.getSprite = function() {
+		if(this.sprite === null) {
+			this.sprite = new PIXI.Sprite(this.getRenderer());
+			this.sprite.x = this.i*40*this.cellSize;
+			this.sprite.y = this.j*40*this.cellSize;
+		}
+		return this.sprite;
+	}
+
+	WorldCell.prototype.getRenderer = function() {
+		if(this.renderer === null) {
+			this.renderer = new PIXI.RenderTexture(this.cellSize*40, this.cellSize*40);
+		}
+		return this.renderer;
+	}
+
 	/**
 	 * Add a child element (e.g. a tile) to this cell
 	 * @param PIXI.DisplayObject child
 	 */
 	WorldCell.prototype.addChild = function(child) {
-		var offsetI = child.i - this.i*CELL_SIZE;
-		var offsetJ = child.j - this.j*CELL_SIZE;
+		var offsetI = child.i - this.i*this.cellSize;
+		var offsetJ = child.j - this.j*this.cellSize;
 		
 		child.setPosition(offsetI * 40, offsetJ * 40);
 		this.tiles.push(child);
@@ -57,9 +72,9 @@ define([
 	WorldCell.prototype.addTo = function(parent) {
 		//if(!this.rendered) this.render();
 
-		this.sprite.i = this.i;
-		this.sprite.j = this.j;
-		parent.addChild(this.sprite);
+		this.getSprite().i = this.i;
+		this.getSprite().j = this.j;
+		parent.addChild(this.getSprite());
 	};
 
 	/**
@@ -68,7 +83,7 @@ define([
 	 * @return Boolean
 	 */
 	WorldCell.prototype.isContainedBy = function(parent) {
-		return (parent.children.indexOf(this.sprite) != -1);
+		return (parent.children.indexOf(this.getSprite()) != -1);
 	};
 
 	/**
@@ -79,7 +94,8 @@ define([
 		var __worldCell = this;
 
 		jobQueue.add(function() {
-			__worldCell.renderer.render(__worldCell.getContainer());
+			console.log('render',__worldCell.i,__worldCell.j);
+			__worldCell.getRenderer().render(__worldCell.getContainer());
 			__worldCell.rendered = true;
 		});
 	};

@@ -9,9 +9,14 @@ define([
 		this.x = 0;
 		this.y = 0;
 		this.displayObject = null;
+		this.tileset = null;
 	};
 
 	Tile.prototype.constructor = Tile;
+
+	Tile.prototype.setTileset = function(tileset) {
+		this.tileset = tileset;
+	}
 
 	Tile.prototype.setPosition = function(x,y) {
 		this.x = x;
@@ -25,7 +30,7 @@ define([
 	Tile.prototype.getDisplayObject = function() {
 		var textureName = null;
 		if(this.type == 'grass') {
-			var neighbours = this.getNeighboursFrom(worldCells);
+			var neighbours = this.getNeighboursFrom(this.tileset);
 			var textureName = this.getTextureNameFrom(neighbours);
 			if(textureName === null) textureName = this.type;
 		} else {
