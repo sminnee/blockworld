@@ -147,7 +147,7 @@ function initCells(w,h) {
 /**
  * Load the cells into the worldLayer that would currently be visible
  */
-function loadCells(worldLayer, renderer) {
+function loadCells(worldLayer, terrainLayer, renderer) {
 	var scale = worldLayer.scale.x; // assume x==y
 	var x = -worldLayer.x / scale;
 	var y = -worldLayer.y / scale;
@@ -159,25 +159,25 @@ function loadCells(worldLayer, renderer) {
 
 	var cellsLoaded = minI+','+minJ+','+maxI+','+maxJ;
 
-	if(typeof worldLayer.cellsLoaded == "string" && worldLayer.cellsLoaded == cellsLoaded) return;
+	if(typeof terrainLayer.cellsLoaded == "string" && terrainLayer.cellsLoaded == cellsLoaded) return;
 
 	var i,j,child;
 
-	for(i = worldLayer.children.length-1; i >= 0; i--) {
-		child = worldLayer.children[i];
+	for(i = terrainLayer.children.length-1; i >= 0; i--) {
+		child = terrainLayer.children[i];
 		if(child.i < minI || child.i > maxI || child.j < minJ || child.j > maxJ) {
-			worldLayer.removeChild(child);
+			terrainLayer.removeChild(child);
 		}
 	}
 	for(i=minI;i<=maxI;i++) {
 		for(j=minJ;j<=maxJ;j++) {
-			if(!worldCells[i][j].isContainedBy(worldLayer)) {
-				worldCells[i][j].addTo(worldLayer);
+			if(!worldCells[i][j].isContainedBy(terrainLayer)) {
+				worldCells[i][j].addTo(terrainLayer);
 			}
 		}
 	}
 
-	worldLayer.cellsLoaded = cellsLoaded;
+	terrainLayer.cellsLoaded = cellsLoaded;
 }
 
 
@@ -196,12 +196,14 @@ document.body.appendChild(renderer.view);
 
 window.onresize = function() {
 	renderer.resize(window.innerWidth,window.innerHeight);
-	loadCells(worldLayer, renderer);
+	loadCells(worldLayer, terrainLayer, renderer);
 };
 
 var worldLayer = new PIXI.DisplayObjectContainer();
+var terrainLayer = new PIXI.DisplayObjectContainer();
 worldLayer.targetScale = null;
 
+worldLayer.addChild(terrainLayer);
 stage.addChild(worldLayer);
 
 // Initialize world cells: 2d array of CELL_SIZExCELL_SIZE cells
@@ -287,7 +289,7 @@ stage.mousemove = function() {
 		var point = this.getMousePosition();
 		worldLayer.x = point.x - this.dragOffset.x;
 		worldLayer.y = point.y - this.dragOffset.y;
-		loadCells(worldLayer, renderer);
+		loadCells(worldLayer, terrainLayer, renderer);
 	}
 };
 
@@ -334,7 +336,7 @@ function scaleAsNeeded() {
 		worldLayer.x -= ((scaleFactor-1) * renderer.width/2) + (1-scaleFactor)*worldLayer.x;
 		worldLayer.y -= ((scaleFactor-1) * renderer.height/2) + (1-scaleFactor)*worldLayer.y;
 
-		loadCells(worldLayer, renderer);
+		loadCells(worldLayer, terrainLayer, renderer);
 
 		if(newScale == worldLayer.targetScale) worldLayer.targetScale = null;
 	}
