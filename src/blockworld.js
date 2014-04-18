@@ -46,8 +46,9 @@ require.config({
 require([
 	"pixijs",
 	"src/Tile.js",
-	"src/WorldCell.js"
-], function(PIXI, Tile, WorldCell) {
+	"src/WorldCell.js",
+	"src/Agent.js"
+], function(PIXI, Tile, WorldCell, Agent) {
 
 /**
  * Implements a simple job queue.  Used for renders
@@ -254,24 +255,43 @@ function fixGrassCells(type, likelihood) {
 	}
 }
 
+var agents = [];
+
+var animals = ['dog','cat','chicken','sheep','cow','horse','wolf','butterfly'];
+
+for(i=0;i<10000;i++) {
+	agents.push(new Agent(
+		Math.floor(Math.random()*WORLD_W),
+		Math.floor(Math.random()*WORLD_H),
+		animals[Math.floor(Math.random()*animals.length)]
+	));
+}
+
 var loader = new PIXI.AssetLoader([
 	"img/animal-sprites.json",
 	"img/grass-rock.json",
 ]);
 loader.onComplete = function() {
 	worldCells.render();
-	loadCells(worldLayer, renderer);
+	agents.forEach(function(agent) {
+		worldLayer.addChild(agent.getSprite());
+	});
+	loadCells(worldLayer, terrainLayer, renderer);
 };
 loader.load();
 
+
 // Animation loop
 requestAnimFrame(animate);
-function animate() {
-
+function animate(time) {
 	scaleAsNeeded();
 
-    requestAnimFrame(animate);
+	agents.forEach(function(agent) {
+		agent.tick(time);
+	});
+
     if(renderer) renderer.render(stage);
+    requestAnimFrame(animate);
 }
 
 // Support for dragging
