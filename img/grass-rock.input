@@ -1,0 +1,22 @@
+{
+"img": "grass-rock.png",
+"size": "40x40",
+"gap": "40x40"
+}
+
+rock-tl-grass
+rock-top-grass
+rock-tr-grass
+grass
+
+rock-left-grass
+rock
+rock-right-grass
+grass-br-rock
+grass-bl-rock
+
+rock-bl-grass
+rock-bottom-grass
+rock-br-grass
+grass-tr-rock
+grass-tl-rock

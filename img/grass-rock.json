@@ -1,0 +1,295 @@
+{
+  "frames": {
+    "rock-tl-grass": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "rock-top-grass": {
+      "frame": {
+        "x": 80,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "rock-tr-grass": {
+      "frame": {
+        "x": 160,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "grass": {
+      "frame": {
+        "x": 240,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "rock-left-grass": {
+      "frame": {
+        "x": 0,
+        "y": 80,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "rock": {
+      "frame": {
+        "x": 80,
+        "y": 80,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "rock-right-grass": {
+      "frame": {
+        "x": 160,
+        "y": 80,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "grass-br-rock": {
+      "frame": {
+        "x": 240,
+        "y": 80,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "grass-bl-rock": {
+      "frame": {
+        "x": 320,
+        "y": 80,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "rock-bl-grass": {
+      "frame": {
+        "x": 0,
+        "y": 160,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "rock-bottom-grass": {
+      "frame": {
+        "x": 80,
+        "y": 160,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "rock-br-grass": {
+      "frame": {
+        "x": 160,
+        "y": 160,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "grass-tr-rock": {
+      "frame": {
+        "x": 240,
+        "y": 160,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    },
+    "grass-tl-rock": {
+      "frame": {
+        "x": 320,
+        "y": 160,
+        "w": 40,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      }
+    }
+  },
+  "meta": {
+    "app": "http://sminnee.github.io/blockworld/",
+    "version": "1.0",
+    "image": "grass-rock.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 440,
+      "h": 280
+    },
+    "scale": "1"
+  }
+}
