@@ -37,28 +37,6 @@ var BLOK = {};
 		],
 	};
 
-
-
-BLOK.textures = {
-	'grass' : PIXI.Texture.fromImage('img/grass.png'),
-	'rock' : PIXI.Texture.fromImage('img/rock.png'),
-
-	'grass-bl-rock' : PIXI.Texture.fromImage('img/grass-bl-rock.png'),
-	'grass-br-rock' : PIXI.Texture.fromImage('img/grass-br-rock.png'),
-	'grass-tl-rock' : PIXI.Texture.fromImage('img/grass-tl-rock.png'),
-	'grass-tr-rock' : PIXI.Texture.fromImage('img/grass-tr-rock.png'),
-
-	'rock-bl-grass' : PIXI.Texture.fromImage('img/rock-bl-grass.png'),
-	'rock-br-grass' : PIXI.Texture.fromImage('img/rock-br-grass.png'),
-	'rock-tl-grass' : PIXI.Texture.fromImage('img/rock-tl-grass.png'),
-	'rock-tr-grass' : PIXI.Texture.fromImage('img/rock-tr-grass.png'),
-
-	'rock-bottom-grass' : PIXI.Texture.fromImage('img/rock-bottom-grass.png'),
-	'rock-left-grass' : PIXI.Texture.fromImage('img/rock-left-grass.png'),
-	'rock-top-grass' : PIXI.Texture.fromImage('img/rock-top-grass.png'),
-	'rock-right-grass' : PIXI.Texture.fromImage('img/rock-right-grass.png')
-};
-
 /**
  * Implements a simple job queue.  Used for renders
  * @type {Object}
@@ -208,7 +186,7 @@ BLOK.Tile.prototype.getDisplayObject = function() {
 	}
 
 	if(this.displayObject === null) {
-		this.displayObject = new PIXI.Sprite(BLOK.textures[textureName]);
+		this.displayObject = new PIXI.Sprite.fromFrame(textureName);
 		this.displayObject.x = this.x;
 		this.displayObject.y = this.y;
 		this.displayObject.i = this.i;
@@ -415,9 +393,15 @@ function fixGrassCells(type, likelihood) {
 	}
 }
 
-worldCells.render();
-
-loadCells(worldLayer, renderer);
+var loader = new PIXI.AssetLoader([
+	"img/animal-sprites.json",
+	"img/grass-rock.json",
+]);
+loader.onComplete = function() {
+	worldCells.render();
+	loadCells(worldLayer, renderer);
+};
+loader.load();
 
 // Animation loop
 requestAnimFrame(animate);
