@@ -13,29 +13,41 @@ var DIR_BOTTOM = 5;
 var DIR_BL = 6;
 var DIR_LEFT = 7;
 
-var BLOK = {};
+var tileLookup = {
+	grass: [
+							//TRBL - 0=diff, 1=same
+		null, //'grass',			//0000 - currently b0kred looking
+		null, //'grass',			//0001 - currently b0kred looking
+		null, //'grass',			//0010 - currently b0kred looking
+		'grass-tr-rock',	//0011
+		null, //'grass',			//0100 - currently b0kred looking
+		null, //'rock-bottom-grass',//0101 - currently b0kred looking
+		'grass-tl-rock',	//0110
+		'rock-bottom-grass',//0111
+		null, //'grass',			//1000 - currently b0kred looking
+		'grass-br-rock',	//1001
+		null, //'rock-left-grass',	//1010 - currently b0kred looking
+		'rock-left-grass',	//1011
+		'rock-tr-grass',	//1100
+		'rock-top-grass',	//1101
+		'rock-right-grass',	//1110
+		'grass',			//1111
+	],
+};
 
-	var tileLookup = {
-		grass: [
-								//TRBL - 0=diff, 1=same
-			null, //'grass',			//0000 - currently b0kred looking
-			null, //'grass',			//0001 - currently b0kred looking
-			null, //'grass',			//0010 - currently b0kred looking
-			'grass-tr-rock',	//0011
-			null, //'grass',			//0100 - currently b0kred looking
-			null, //'rock-bottom-grass',//0101 - currently b0kred looking
-			'grass-tl-rock',	//0110
-			'rock-bottom-grass',//0111
-			null, //'grass',			//1000 - currently b0kred looking
-			'grass-br-rock',	//1001
-			null, //'rock-left-grass',	//1010 - currently b0kred looking
-			'rock-left-grass',	//1011
-			'rock-tr-grass',	//1100
-			'rock-top-grass',	//1101
-			'rock-right-grass',	//1110
-			'grass',			//1111
-		],
-	};
+var worldCells;
+
+require.config({
+    paths: {
+    	"pixijs": "../bower_components/pixi.js/bin/pixi"
+    }
+});
+
+require([
+	"pixijs",
+	"src/Tile.js",
+	"src/WorldCell.js"
+], function(PIXI, Tile, WorldCell) {
 
 /**
  * Implements a simple job queue.  Used for renders
@@ -72,160 +84,7 @@ jobQueue = {
 	}
 };
 
-/**
- * Implements an 8x8 grouping of tiles, use to speed up rendering
- * @param int i x-axis index of the cell
- * @param int j y-axis index of the cell
- */
-BLOK.WorldCell = function(i,j) {
-	this.tiles = [];
-	this.container = null;
-	this.renderer = new PIXI.RenderTexture(CELL_SIZE*40, CELL_SIZE*40);
-	this.sprite = new PIXI.Sprite(this.renderer);
-	this.sprite.x = i*40*CELL_SIZE;
-	this.sprite.y = j*40*CELL_SIZE;
-	//if((i+j) % 2) this.sprite.tint = 0xAAAAAA;
-	this.rendered = false;
-	this.i = i;
-	this.j = j;
-};
 
-BLOK.WorldCell.prototype.getContainer = function() {
-	if(this.container === null) {
-		this.container = new PIXI.DisplayObjectContainer();
-		for(var i=0;i<this.tiles.length;i++) {
-			this.container.addChild(this.tiles[i].getDisplayObject());
-		}
-	}
-	return this.container;
-};
-
-/**
- * Add a child element (e.g. a tile) to this cell
- * @param PIXI.DisplayObject child
- */
-BLOK.WorldCell.prototype.addChild = function(child) {
-	var offsetI = child.i - this.i*CELL_SIZE;
-	var offsetJ = child.j - this.j*CELL_SIZE;
-	
-	child.setPosition(offsetI * 40, offsetJ * 40);
-	this.tiles.push(child);
-
-	if(this.container !== null) {
-		this.container.addChild(this.tiles[i].getDisplayObject());
-	}
-
-	this.rendered = false;
-};
-
-/**
- * Load this cell into a parent object, for rendering
- * @param PIXI.DisplayObjectContainer parent
- */
-BLOK.WorldCell.prototype.addTo = function(parent) {
-	//if(!this.rendered) this.render();
-
-	this.sprite.i = this.i;
-	this.sprite.j = this.j;
-	parent.addChild(this.sprite);
-};
-
-/**
- * Returns true ift his WorldCell is already contained by the given parent
- * @param  PIXI.DisplayObjectContainer parent
- * @return Boolean
- */
-BLOK.WorldCell.prototype.isContainedBy = function(parent) {
-	return (parent.children.indexOf(this.sprite) != -1);
-};
-
-/**
- * Add a child element (e.g. a tile) to this cell
- * @param PIXI.DisplayObject child
- */
-BLOK.WorldCell.prototype.render = function(child) {
-	var __worldCell = this;
-
-	jobQueue.add(function() {
-		__worldCell.renderer.render(__worldCell.getContainer());
-		__worldCell.rendered = true;
-	});
-};
-
-BLOK.WorldCell.prototype.constructor = BLOK.WorldCell;
-
-
-BLOK.Tile = function(i,j, type) {
-	this.type = (type == 'grass') ? 'grass' : 'rock';
-	this.i = i;
-	this.j = j;
-	this.x = 0;
-	this.y = 0;
-	this.displayObject = null;
-};
-
-BLOK.Tile.prototype.constructor = BLOK.Tile;
-
-BLOK.Tile.prototype.setPosition = function(x,y) {
-	this.x = x;
-	this.y = y;
-	if(this.displayObject !== null) {
-		this.displayObject.x = this.x;
-		this.displayObject.x = this.y;
-	}
-};
-
-BLOK.Tile.prototype.getDisplayObject = function() {
-	var textureName = null;
-	if(this.type == 'grass') {
-		var neighbours = this.getNeighboursFrom(worldCells);
-		var textureName = this.getTextureNameFrom(neighbours);
-		if(textureName === null) textureName = this.type;
-	} else {
-		textureName = this.type;
-	}
-
-	if(this.displayObject === null) {
-		this.displayObject = new PIXI.Sprite.fromFrame(textureName);
-		this.displayObject.x = this.x;
-		this.displayObject.y = this.y;
-		this.displayObject.i = this.i;
-		this.displayObject.j = this.j;
-	}
-	return this.displayObject;
-};
-
-/**
- * Given a WorldCells object, return an array of this cell's neighbours
- * Clockwise from top-left
- */
-BLOK.Tile.prototype.getNeighboursFrom = function(worldCells) {
-	return [
-		worldCells.getCell(this.i-1,this.j-1), // 0: top-left
-		worldCells.getCell(this.i,this.j-1),   // 1: top
-		worldCells.getCell(this.i+1,this.j-1), // 2: top-right
-		worldCells.getCell(this.i+1,this.j),   // 3; right
-		worldCells.getCell(this.i+1,this.j+1), // 4: bottom-right
-		worldCells.getCell(this.i,this.j+1),   // 5: bottom
-		worldCells.getCell(this.i-1,this.j), // 6: bottom-left
-		worldCells.getCell(this.i-1,this.j),   // 7: left
-	];
-};
-
-/**
- * Return the texture name, given an array of neighbours
- * @param  {[type]} neighbours [description]
- * @return {[type]}            [description]
- */
-BLOK.Tile.prototype.getTextureNameFrom = function(neighbours) {
-	var lookupIdx = 0;
-	if(!neighbours[DIR_TOP] || neighbours[DIR_TOP].type == this.type) lookupIdx += 8;
-	if(!neighbours[DIR_RIGHT] || neighbours[DIR_RIGHT].type == this.type) lookupIdx += 4;
-	if(!neighbours[DIR_BOTTOM] || neighbours[DIR_BOTTOM].type == this.type) lookupIdx += 2;
-	if(!neighbours[DIR_LEFT] || neighbours[DIR_LEFT].type == this.type) lookupIdx += 1;
-
-	return tileLookup[this.type][lookupIdx]; 
-};
 
 /**
  * Initialise a w x h array of world cells.
@@ -238,7 +97,7 @@ function initCells(w,h) {
 	for(var i=0;i<w;i++) {
 		worldCells[i] = [];
 		for(var j=0;j<h;j++) {
-			worldCells[i][j] = new BLOK.WorldCell(i,j);
+			worldCells[i][j] = new WorldCell(i,j);
 		}
 	}
 
@@ -346,13 +205,13 @@ worldLayer.targetScale = null;
 stage.addChild(worldLayer);
 
 // Initialize world cells: 2d array of CELL_SIZExCELL_SIZE cells
-var worldCells = initCells(WORLD_W/CELL_SIZE, WORLD_H/CELL_SIZE);
+worldCells = initCells(WORLD_W/CELL_SIZE, WORLD_H/CELL_SIZE);
 var i,j,c;
 
 // Initialize ground - scattering a few rocks
 for(i=0;i<WORLD_W;i++) {
 	for(j=0;j<WORLD_H;j++) {
-		worldCells.addChild(new BLOK.Tile(i,j, Math.random()>0.95? 'rock':'grass'));
+		worldCells.addChild(new Tile(i,j, Math.random()>0.95? 'rock':'grass'));
 	}
 }
 
@@ -480,3 +339,5 @@ function scaleAsNeeded() {
 		if(newScale == worldLayer.targetScale) worldLayer.targetScale = null;
 	}
 }
+
+});
