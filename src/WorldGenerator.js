@@ -1,6 +1,6 @@
 define([
 	"src/World.js",
-	"src/CellularTileset.js",
+	"src/CellularTileSet.js",
 	"src/Tile.js",
 	"src/Agent.js"
 ], function(World, CellularTileSet, Tile, Agent) {
