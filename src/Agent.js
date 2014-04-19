@@ -1,5 +1,5 @@
 define([
-	"src/Animation.js"
+	"js/Animation.js"
 ], function(Animation) {
 
 	function animationsFor(animal) {

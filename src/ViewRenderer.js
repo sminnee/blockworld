@@ -1,6 +1,6 @@
 define([
 	"pixijs",
-	"src/JobQueue.js"
+	"js/JobQueue.js"
 ], function(PIXI, JobQueue) {
 
 	/**

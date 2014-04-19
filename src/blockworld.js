@@ -37,15 +37,15 @@ var tileLookup = {
 
 require.config({
     paths: {
-    	"pixijs": "../bower_components/pixi.js/bin/pixi"
+    	"pixijs": "vendor/pixi.js/bin/pixi"
     }
 });
 
 require([
 	"pixijs",
-	"src/WorldGenerator.js",
-	"src/ViewManager.js",
-	"src/ViewRenderer.js",
+	"js/WorldGenerator.js",
+	"js/ViewManager.js",
+	"js/ViewRenderer.js",
 ], function(PIXI, WorldGenerator, ViewManager, ViewRenderer) {
 
 	/// Generate a random world

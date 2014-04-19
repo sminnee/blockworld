@@ -1,5 +1,5 @@
 define([
-	"src/WorldCell.js",
+	"js/WorldCell.js",
 ], function(WorldCell) {
 
 	/**
