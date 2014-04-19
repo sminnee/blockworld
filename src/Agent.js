@@ -1,7 +1,6 @@
 define([
-	"pixijs",
 	"src/Animation.js"
-], function(PIXI, Animation) {
+], function(Animation) {
 
 	function animationsFor(animal) {
 		return {

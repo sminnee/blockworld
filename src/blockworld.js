@@ -46,10 +46,6 @@ require([
 	"src/WorldGenerator.js",
 	"src/ViewManager.js",
 	"src/ViewRenderer.js",
-	"src/Tile.js",
-	"src/WorldCell.js",
-	"src/Agent.js"
-], function(PIXI, WorldGenerator, ViewManager, ViewRenderer, Tile, WorldCell, Agent) {
 
 /**
  * Implements a simple job queue.  Used for renders
@@ -87,9 +83,9 @@ jobQueue = {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+], function(PIXI, WorldGenerator, ViewManager, ViewRenderer) {
 
-
-	/// Generate a random work
+	/// Generate a random world
 	var world = WorldGenerator.generate(WORLD_W, WORLD_H, 10000);
 
 	// Create a renderer to display it
@@ -119,11 +115,6 @@ jobQueue = {
 	};
 
 	loader.load();
-
-	/**
-	 * Initialise PIXI: renderer, stage, and worldLayer
-	 */
-
 
 	// Game loop
 	requestAnimFrame(animate);

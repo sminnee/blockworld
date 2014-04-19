@@ -1,7 +1,6 @@
 define([
 	"pixijs",
-	"src/Animation.js"
-], function(PIXI, Animation) {
+], function(PIXI) {
 
 	/**
 	 * The ViewManager is responsible for managing the user's interaction with the world.

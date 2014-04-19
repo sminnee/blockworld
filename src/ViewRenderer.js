@@ -7,18 +7,17 @@ define([
 	 * The ViewRenderer is responsible looking after PIXI rendering.
 	 * It will ensure that off-screen content uses a minimum amount of memory.
 	 */
-	ViewRenderer = function(viewManager) {
-		this.viewManager = viewManager;
-
-
+	ViewRenderer = function() {
 		// create an new instance of a pixi stage
 		this.stage = new PIXI.Stage(0x333333);
 
+		// create a world layer
 		this.worldLayer = new PIXI.DisplayObjectContainer();
 		this.stage.addChild(this.worldLayer);
 
 		this.viewportRange = null;
 
+		// A list of items that will have refreshParentContainer() called on them whenever the viewport changes
 		this.renderOnDemandList = [];
 
 		// create a renderer instance.
