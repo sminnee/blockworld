@@ -33,6 +33,13 @@ define([
 
 	ViewRenderer.prototype.constructor = ViewRenderer;
 
+	/**
+	 * When passed into a game loop, ViewRenderer should render on every tick()
+	 */
+	ViewRenderer.prototype.tick = function() {
+		this.render();
+	}
+
 	ViewRenderer.prototype.render = function() {
 		if(this.renderer) this.renderer.render(this.stage);   
 	}

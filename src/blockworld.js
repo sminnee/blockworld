@@ -46,7 +46,8 @@ require([
 	"js/WorldGenerator.js",
 	"js/ViewManager.js",
 	"js/ViewRenderer.js",
-], function(PIXI, WorldGenerator, ViewManager, ViewRenderer) {
+	"js/GameLoop.js"
+], function(PIXI, WorldGenerator, ViewManager, ViewRenderer, GameLoop) {
 
 	/// Generate a random world
 	var world = WorldGenerator.generate(WORLD_W, WORLD_H, 10000);
@@ -79,17 +80,11 @@ require([
 
 	loader.load();
 
-	// Game loop
-	requestAnimFrame(animate);
-	function animate(time) {
-		viewManager.tick();
+	var gameLoop = new GameLoop([
+		viewManager,
+		world,
+		viewRenderer
+	]);
 
-		world.tick();
-
-		viewRenderer.render();
-
-	    requestAnimFrame(animate);
-	}
-
-
+	gameLoop.start();
 });
