@@ -43,10 +43,10 @@ define([
 	/**
 	 * Render this tileset by rendering all its cells
 	 */
-	CellularTileSet.prototype.render = function() {
+	CellularTileSet.prototype.render = function(renderQueue, priority) {
 		for(var i=0;i<this.worldCells.length;i++) {
 			for(var j=0;j<this.worldCells[i].length;j++) {
-				this.worldCells[i][j].render();
+				this.worldCells[i][j].render(renderQueue, priority);
 			}
 		}
 	};
@@ -54,7 +54,7 @@ define([
 	/**
 	 * Load the cells into the terrainLayer that would currently be visible
 	 */
-	CellularTileSet.prototype.refreshParentContainer = function (terrainLayer, minI, minJ, maxI, maxJ) {
+	CellularTileSet.prototype.refreshParentContainer = function (viewRenderer, terrainLayer, minI, minJ, maxI, maxJ) {
 		// Turn tile references into cell references
 		minI = Math.min(this.w-1, Math.floor(minI / this.cellSize));
 		minJ = Math.min(this.w-1, Math.floor(minJ / this.cellSize));
@@ -69,11 +69,16 @@ define([
 				terrainLayer.removeChild(child);
 			}
 		}
+
+		// Priority 0 is anything on the screen at the moment. Clear out everything that *was* on the screen...
+		viewRenderer.renderQueue.cancelByPriority(0);
 		for(i=minI;i<=maxI;i++) {
 			for(j=minJ;j<=maxJ;j++) {
 				if(!this.worldCells[i][j].isContainedBy(terrainLayer)) {
 					this.worldCells[i][j].addTo(terrainLayer);
 				}
+				// ...and add things that are on the screen now
+				this.worldCells[i][j].render(viewRenderer, 0);
 			}
 		}
 

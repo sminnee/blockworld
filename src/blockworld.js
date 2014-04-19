@@ -46,43 +46,6 @@ require([
 	"src/WorldGenerator.js",
 	"src/ViewManager.js",
 	"src/ViewRenderer.js",
-
-/**
- * Implements a simple job queue.  Used for renders
- * @type {Object}
- */
-jobQueue = {
-	queue: [],
-	running: false,
-	add: function(job) {
-		jobQueue.queue.push(job);
-		if(!jobQueue.running) {
-			jobQueue.running = true;
-			jobQueue.delayedRun();
-		}
-	},
-
-	delayedRun: function() {
-		setTimeout(function() {
-			jobQueue.run();
-		}, 10);
-	},
-
-	run: function() {
-		if(!jobQueue.queue.length) return;
-		jobQueue.running = true;
-
-		var job = jobQueue.queue[0];
-		jobQueue.queue.shift();
-
-		job();
-
-		if(jobQueue.queue.length) jobQueue.delayedRun();
-		else jobQueue.running = false;
-	}
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ], function(PIXI, WorldGenerator, ViewManager, ViewRenderer) {
 
 	/// Generate a random world
@@ -105,7 +68,7 @@ jobQueue = {
 	]);
 
 	loader.onComplete = function() {
-		world.getTileset().render();
+		world.getTileset().render(viewRenderer, 100);
 
 		world.agents.forEach(function(agent) {
 			viewRenderer.getWorldLayer().addChild(agent.getSprite());

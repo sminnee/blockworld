@@ -1,7 +1,7 @@
 define([
 	"pixijs",
-	"src/Animation.js"
-], function(PIXI, Animation) {
+	"src/JobQueue.js"
+], function(PIXI, JobQueue) {
 
 	/**
 	 * The ViewRenderer is responsible looking after PIXI rendering.
@@ -24,6 +24,9 @@ define([
 		this.renderer = PIXI.autoDetectRenderer(window.innerWidth,window.innerHeight);
 		document.body.appendChild(this.renderer.view);
 
+		// create a queue for managing slow jobs (e.g. cell rendering)
+		this.renderQueue = new JobQueue;
+
 		var __viewRenderer = this;
 		window.addEventListener('resize', function() { __viewRenderer.resizeRenderer(window); } );
 	}
@@ -45,7 +48,7 @@ define([
 	/**
 	 * Add an item to be rendered on demand.
 	 * As the viewport shifts, the following function will be called:
-	 *   item.refreshParentContainer(target, minI, minJ, maxI, maxJ)
+	 *   item.refreshParentContainer(viewRenderer, target, minI, minJ, maxI, maxJ)
 	 * I and J refer to 40x40 tileset cells
 	 */
 	ViewRenderer.prototype.renderOnDemand = function(item, target) {
@@ -99,8 +102,9 @@ define([
 
 		// Refresh the contents of load-on-demand sets (map tileset, agents, etc)
 		// This is the core of ensuring that only necessary content is on-screen
+		var __viewRenderer = this;
 		this.renderOnDemandList.forEach(function(entry) {
-			entry.item.refreshParentContainer(entry.target, minI, minJ, maxI, maxJ);
+			entry.item.refreshParentContainer(__viewRenderer, entry.target, minI, minJ, maxI, maxJ);
 		});
 
 		this.viewportRange = viewportRange;

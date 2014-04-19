@@ -70,8 +70,6 @@ define([
 	 * @param PIXI.DisplayObjectContainer parent
 	 */
 	WorldCell.prototype.addTo = function(parent) {
-		//if(!this.rendered) this.render();
-
 		this.getSprite().i = this.i;
 		this.getSprite().j = this.j;
 		parent.addChild(this.getSprite());
@@ -87,17 +85,18 @@ define([
 	};
 
 	/**
-	 * Add a child element (e.g. a tile) to this cell
-	 * @param PIXI.DisplayObject child
+	 * Render source elements for this objet, ready to displa
+	 * @param ViewRenderer viewRenderer
 	 */
-	WorldCell.prototype.render = function(child) {
+	WorldCell.prototype.render = function(viewRenderer, priority) {
+		if(this.rendered) return;
+
 		var __worldCell = this;
 
-		jobQueue.add(function() {
-			console.log('render',__worldCell.i,__worldCell.j);
+		viewRenderer.renderQueue.add(function() {
 			__worldCell.getRenderer().render(__worldCell.getContainer());
 			__worldCell.rendered = true;
-		});
+		}, priority,'render-worldcell-' + this.i + '-' + this.j);
 	};
 
 	return WorldCell;
