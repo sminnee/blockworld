@@ -12,7 +12,9 @@ var Agent = require('../shared/Agent.js');
 var WorldFetcher = function(world, viewRenderer) {
 	this.world = world;
 	this.viewRenderer = viewRenderer;
-	this.socket = io.connect('/');
+	// Always connect direct to Node for websockets. I haven't been able to figure out how to get Nginx properly proxying
+	// the websockets yet :-(
+	this.socket = io.connect('ws://' + location.hostname + ':3000');
 
 	__worldFetcher = this;
 
