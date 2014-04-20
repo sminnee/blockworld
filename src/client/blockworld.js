@@ -26,8 +26,8 @@ var GameLoop = require('../shared/GameLoop.js');
 
 /// Get the world
 var world = new World(null, []);
-var worldFetcher = new WorldFetcher();
-worldFetcher.loadTilesetInto(world);
+var worldFetcher = new WorldFetcher(world);
+worldFetcher.loadWorld();
 
 // Create a renderer to display it
 var viewRenderer = new ViewRenderer();
@@ -48,6 +48,8 @@ loader.onComplete = function() {
     var terrainLayer = new PIXI.DisplayObjectContainer();
     viewRenderer.getWorldLayer().addChild(terrainLayer);
     viewRenderer.renderOnDemand(world.getTileset(), terrainLayer);
+
+    viewRenderer.renderOnDemand(worldFetcher, null);
 
 
     world.agents.forEach(function(agent) {

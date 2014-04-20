@@ -1,8 +1,10 @@
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
+var http = require('http');
 
 var app = express();
+var server = http.createServer(app);
 
 app.use(express.static(path.join(__dirname, '../../public')));
 
@@ -58,6 +60,27 @@ app.get('/api/agents', function(req, res){
   res.send(JSON.stringify(output));
 });
 
+var io = require('socket.io').listen(server);
+io.sockets.on('connection', function (socket) {
+
+  var watcher = null;
+
+  // Update this client's viewport 
+  socket.on('setViewport', function (data) {
+    // TODO: Pull initial state
+
+    // Create a world watcher to handle changes occurring within that window
+    if(watcher) world.removeWatcher(watcher);
+    console.log(data);
+    watcher = world.addWatcher(data.minI, data.minJ, data.maxI, data.maxJ, function(changes) {
+      socket.emit('worldChanges', changes);
+    });
+  });
+
+
+
+});
+
 //var favicon = require('static-favicon');
 //var cookieParser = require('cookie-parser');
 //var bodyParser = require('body-parser');
@@ -111,4 +134,4 @@ app.use(function(err, req, res, next) {
 });
 */
 
-module.exports = app;
+module.exports = server;

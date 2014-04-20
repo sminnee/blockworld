@@ -49,8 +49,8 @@ Animation.prototype.toJSON = function() {
  * Crete an object from its API JSON representation.
  * @static
  */
-Animation.fromJSON = function(data) {
-  return new Animation(data);
+Animation.fromJSON = function(data, sprite) {
+  return new Animation(data, sprite);
 }
 
 module.exports = Animation;
