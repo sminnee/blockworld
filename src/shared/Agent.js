@@ -45,6 +45,8 @@ var Agent = function(i,j,animal) {
   this.animation = new Animation(this.animationSet['walk-right']);
 }
 
+Agent.prototype.constructor = Agent;
+
 Agent.prototype.sprite = null;
 
 Agent.prototype.getSprite = function() {
@@ -102,6 +104,34 @@ Agent.prototype.setDirection = function(dir) {
   }
 }
 
-Agent.prototype.constructor = Agent;
+/**
+ * Generate an API-ready JSON representation of this object
+ */
+Agent.prototype.toJSON = function() {
+  return {
+    x: this.x,
+    y: this.y,
+    dX: this.dX,
+    dY: this.dY,
+    animation: this.animation.toJSON(),
+  }
+}
+
+/**
+ * Crete an object from its API JSON representation.
+ * @static
+ */
+Agent.fromJSON = function(data) {
+  var i = Math.floor(data.x/40);
+  var j = Math.floor(data.y/40);
+  var agent = new Agent(i,j,null);
+
+  agent.x = data.x;
+  agent.y = data.y;
+  agent.dX = data.dX;
+  agent.dY = data.dY;
+  agent.animation = Animation.fromJSON(data.animation);
+  return agent;
+}
 
 module.exports = Agent;

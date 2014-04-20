@@ -105,4 +105,38 @@ CellularTileSet.prototype.allByType = function(type) {
   return accumulator;
 };
 
+/**
+ * Return a JSON (non-string) representation of this tileset, suitable for API transmission.
+ */
+CellularTileSet.prototype.toJSON = function() {
+  var output = []
+  for(var i=0;i<this.worldCells.length;i++) {
+    output[i] = [];
+    for(var j=0;j<this.worldCells[i].length;j++) {
+      output[i][j] = this.worldCells[i][j].toJSON();
+    }
+  }
+  return output;
+}
+
+/**
+ * Create a CellularTileset from the given (non-string) JSON representation
+ * @static
+ */
+CellularTileSet.fromJSON = function(json) {
+  var w = json.length;
+  var h = json[0].length;
+  var cellSize = json[0][0].length;
+
+  var tileset = new CellularTileSet(w*cellSize, h*cellSize, cellSize);
+
+  for(var i=0;i<json.length;i++) {
+    for(var j=0;j<json[i].length;j++) {
+      tileset.worldCells[i][j].addFromJSON(json[i][j], tileset);
+    }
+  }
+
+  return tileset;
+}
+
 module.exports = CellularTileSet;

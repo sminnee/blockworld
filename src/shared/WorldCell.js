@@ -1,3 +1,5 @@
+var Tile = require('./Tile.js');
+
 /**
  * Implements an 8x8 grouping of tiles, use to speed up rendering
  * @param int i x-axis index of the cell
@@ -93,6 +95,36 @@ WorldCell.prototype.render = function(viewRenderer, priority) {
     __worldCell.getRenderer().render(__worldCell.getContainer());
     __worldCell.rendered = true;
   }, priority,'render-worldcell-' + this.i + '-' + this.j);
+};
+
+/**
+ * Return a JSON (non-string) representation of this cell, suitable for API transmission.
+ */
+WorldCell.prototype.toJSON = function() {
+  var output = []
+  var iOffset = this.i * this.cellSize;
+  var jOffset = this.j * this.cellSize;
+  this.tiles.forEach(function(tile) {
+    if(!output[tile.i - iOffset]) output[tile.i - iOffset] = [];
+    output[tile.i - iOffset][tile.j - jOffset] = tile.type;
+  });
+  return output;
+};
+
+/**
+ * Add tiles to this cell from the given JSON representation of its content.
+ */
+WorldCell.prototype.addFromJSON = function(json, tileset) {
+  var iOffset = this.i * this.cellSize;
+  var jOffset = this.j * this.cellSize;
+
+  var tile;
+  for(var i=0;i<json.length;i++) {
+    for(var j=0;j<json[i].length;j++) {
+      tile = new Tile(i + iOffset, j + jOffset, json[i][j]);
+      tileset.addChild(tile);
+    }
+  }
 };
 
 module.exports = WorldCell;

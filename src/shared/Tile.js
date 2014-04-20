@@ -80,4 +80,16 @@ Tile.prototype.getTextureNameFrom = function(neighbours) {
   return tileLookup[this.type][lookupIdx]; 
 };
 
+/**
+ * Return a JSON (non-string) representation of this cell, suitable for API transmission.
+ */
+Tile.prototype.toJSON = function() {
+  return {
+    'i': this.i,
+    'j': this.j,
+    'type': this.type
+  };
+}
+
+
 module.exports = Tile;

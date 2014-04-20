@@ -38,5 +38,20 @@ Animation.prototype.tick = function(time) {
   } 
 };
 
+/**
+ * Generate an API-ready JSON representation of this object
+ */
+Animation.prototype.toJSON = function() {
+  return this.data;
+}
+
+/**
+ * Crete an object from its API JSON representation.
+ * @static
+ */
+Animation.fromJSON = function(data) {
+  return new Animation(data);
+}
+
 module.exports = Animation;
 
