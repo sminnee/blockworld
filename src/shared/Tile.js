@@ -15,6 +15,28 @@ var Tile = function(i,j, type) {
 
 Tile.prototype.constructor = Tile;
 
+var tileLookup = {
+  grass: [
+              //TRBL - 0=diff, 1=same
+    null, //'grass',      //0000 - currently b0kred looking
+    null, //'grass',      //0001 - currently b0kred looking
+    null, //'grass',      //0010 - currently b0kred looking
+    'grass-tr-rock',  //0011
+    null, //'grass',      //0100 - currently b0kred looking
+    null, //'rock-bottom-grass',//0101 - currently b0kred looking
+    'grass-tl-rock',  //0110
+    'rock-bottom-grass',//0111
+    null, //'grass',      //1000 - currently b0kred looking
+    'grass-br-rock',  //1001
+    null, //'rock-left-grass',  //1010 - currently b0kred looking
+    'rock-left-grass',  //1011
+    'rock-tr-grass',  //1100
+    'rock-top-grass', //1101
+    'rock-right-grass', //1110
+    'grass',      //1111
+  ],
+};
+
 Tile.prototype.setTileset = function(tileset) {
   this.tileset = tileset;
 }

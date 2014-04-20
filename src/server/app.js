@@ -11,6 +11,31 @@ app.use('/js/dist',express.static(path.join(__dirname, '../../dist')));
 app.use('/js/shared',express.static(path.join(__dirname, '../shared')));
 app.use('/js/vendor',express.static(path.join(__dirname, '../../bower_components')));
 
+WORLD_W = 256;
+WORLD_H = 256;
+
+CELL_SIZE = 8;
+
+DIR_TL = 0;
+DIR_TOP = 1;
+DIR_TR = 2;
+DIR_RIGHT = 3;
+DIR_BR = 4;
+DIR_BOTTOM = 5;
+DIR_BL = 6;
+DIR_LEFT = 7;
+
+var WorldGenerator = require('../shared/WorldGenerator.js');
+var GameLoop = require('../shared/GameLoop.js');
+
+var world = WorldGenerator.generate(WORLD_W, WORLD_H, 10000);
+
+var gameLoop = new GameLoop([
+  [world,'tickServer']
+]);
+
+gameLoop.start();
+
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {
@@ -19,8 +44,18 @@ app.use(function(err, req, res, next) {
   });
 });
 
-app.get('/', function(req, res){
-  res.send('Hello World');
+app.get('/api/tiles', function(req, res){
+  res.setHeader('Content-type', 'application/json');
+  res.send(JSON.stringify(world.getTileset().toJSON()));
+});
+
+app.get('/api/agents', function(req, res){
+  res.setHeader('Content-type', 'application/json');
+  var output = [];
+  world.getAgents().forEach(function(agent) {
+    output.push(agent.toJSON());
+  });
+  res.send(JSON.stringify(output));
 });
 
 //var favicon = require('static-favicon');
