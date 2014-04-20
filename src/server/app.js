@@ -11,13 +11,13 @@ app.use('/js/dist',express.static(path.join(__dirname, '../../dist')));
 app.use('/js/shared',express.static(path.join(__dirname, '../shared')));
 app.use('/js/vendor',express.static(path.join(__dirname, '../../bower_components')));
 
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
+app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: err
+  });
+});
 
 app.get('/', function(req, res){
   res.send('Hello World');
