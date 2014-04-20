@@ -24,13 +24,13 @@ var ViewManager = require('./ViewManager.js');
 var ViewRenderer = require('./ViewRenderer.js');
 var GameLoop = require('../shared/GameLoop.js');
 
-/// Get the world
-var world = new World(null, []);
-var worldFetcher = new WorldFetcher(world);
-worldFetcher.loadWorld();
-
-// Create a renderer to display it
+// Create a renderer to display the world
 var viewRenderer = new ViewRenderer();
+
+/// Get the world
+var world = new World();
+var worldFetcher = new WorldFetcher(world, viewRenderer);
+worldFetcher.loadWorld();
 
 // Create a view managaer to navigate the rendered world
 var viewManager = new ViewManager(viewRenderer, viewRenderer.getWorldLayer());

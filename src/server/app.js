@@ -30,7 +30,7 @@ DIR_LEFT = 7;
 var WorldGenerator = require('../shared/WorldGenerator.js');
 var GameLoop = require('../shared/GameLoop.js');
 
-var world = WorldGenerator.generate(WORLD_W, WORLD_H, 10000);
+var world = WorldGenerator.generate(WORLD_W, WORLD_H, 1000);
 
 var gameLoop = new GameLoop([
   [world,'tickServer']
@@ -63,18 +63,20 @@ app.get('/api/agents', function(req, res){
 var io = require('socket.io').listen(server);
 io.sockets.on('connection', function (socket) {
 
-  var watcher = null;
+  var watcherID = null;
 
   // Update this client's viewport 
   socket.on('setViewport', function (data) {
     // TODO: Pull initial state
 
     // Create a world watcher to handle changes occurring within that window
-    if(watcher) world.removeWatcher(watcher);
-    console.log(data);
-    watcher = world.addWatcher(data.minI, data.minJ, data.maxI, data.maxJ, function(changes) {
+    if(watcherID) world.removeWatcher(watcherID);
+
+    watcherID = world.addWatcher(data.minI, data.minJ, data.maxI, data.maxJ, function(changes) {
       socket.emit('worldChanges', changes);
     });
+
+    world.refreshWatcher(watcherID)
   });
 
 

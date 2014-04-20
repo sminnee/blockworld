@@ -84,7 +84,7 @@ Agent.prototype.tickServer = function(time, world) {
  * Returns true if this agent lies within the given tile rectangle
  */
 Agent.prototype.isWithinTileRect = function(minI, minJ, maxI, maxJ) {
-  return this.i >= minI && this.i <= maxJ && this.j >= minJ && this.j <= maxJ;
+  return this.i >= minI && this.i <= maxI && this.j >= minJ && this.j <= maxJ;
 };
 
 Agent.prototype.move = function(x,y) {
@@ -138,6 +138,8 @@ Agent.prototype.toJSON = function() {
     y: this.y,
     dX: this.dX,
     dY: this.dY,
+    i: this.i,
+    j: this.j,
     animation: this.animation.toJSON(),
   }
 }
