@@ -1,6 +1,3 @@
-define([
-	"pixijs"
-], function(PIXI) {
 
 	var Tile = function(i,j, type) {
 		this.type = (type == 'grass') ? 'grass' : 'rock';
@@ -79,5 +76,4 @@ define([
 		return tileLookup[this.type][lookupIdx]; 
 	};
 
-	return Tile;
-});
+	module.exports = Tile;

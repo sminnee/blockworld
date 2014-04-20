@@ -1,6 +1,5 @@
-define([
-	"js/Animation.js"
-], function(Animation) {
+// TODO: drop this dependency
+var Animation = require('../client/Animation.js');
 
 	function animationsFor(animal) {
 		return {
@@ -102,5 +101,4 @@ define([
 
 	Agent.prototype.constructor = Agent;
 
-	return Agent;
-});
+	module.exports = Agent;

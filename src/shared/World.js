@@ -1,5 +1,3 @@
-define([
-], function() {
 
 	/**
 	 * The World object contains all terrain and agents that make up the world.
@@ -22,5 +20,4 @@ define([
 		});
 	}
 
-	return World;
-});
+	module.exports = World;

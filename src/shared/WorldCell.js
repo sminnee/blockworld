@@ -1,6 +1,4 @@
-define([
-	"pixijs"
-], function(PIXI) {
+
 
 	/**
 	 * Implements an 8x8 grouping of tiles, use to speed up rendering
@@ -99,5 +97,4 @@ define([
 		}, priority,'render-worldcell-' + this.i + '-' + this.j);
 	};
 
-	return WorldCell;
-});
+	module.exports = WorldCell;

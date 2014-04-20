@@ -1,29 +1,29 @@
-define([
-], function() {
 
 	/**
 	 * GameLoop implements the game loop pattern.
 	 * Specifically, it will call tick(time) on every subsystem that is passed into the subsystems constructor arg.
 	 */
-	GameLoop = function(subsystems) {
+	GameLoop = function(requestAnimFrame, subsystems) {
+		this.requestAnimFrame = requestAnimFrame;
 		this.subsystems = subsystems;
 	}
 	GameLoop.prototype.constructor = GameLoop;
 
 	GameLoop.prototype.start = function() {
-		__subsystems = this.subsystems;
+		var __subsystems = this.subsystems;
+		var __raf = this.requestAnimFrame;
 
 		function animate(time) {
 			__subsystems.forEach(function(subsystem) {
 				subsystem.tick(time);
 			})
 
-			requestAnimFrame(animate);
+			__raf(animate);
 		}
 
-		requestAnimFrame(animate);
+		__raf(animate);
 	}
 
-	return GameLoop;
-});
+	module.exports = GameLoop;
+
 

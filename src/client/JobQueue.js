@@ -1,5 +1,3 @@
-define([
-], function() {
 
 	/**
 	 * JobQueue will work its way through a set of jobs, defined as closures.
@@ -95,6 +93,4 @@ define([
 		}
 	};
 
-	return JobQueue;
-
-});
+	module.exports = JobQueue;

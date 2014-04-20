@@ -1,6 +1,4 @@
-define([
-	"js/WorldCell.js",
-], function(WorldCell) {
+var WorldCell = require('./WorldCell.js');
 
 	/**
 	 * The CellularTileSet represents a large set of tiles that are rendered into 8x8 "cells".
@@ -107,5 +105,5 @@ define([
 		return accumulator;
 	};
 
-	return CellularTileSet;
-});
+	module.exports = CellularTileSet;
+

@@ -1,9 +1,7 @@
-define([
-	"js/World.js",
-	"js/CellularTileSet.js",
-	"js/Tile.js",
-	"js/Agent.js"
-], function(World, CellularTileSet, Tile, Agent) {
+var World = require('./World.js');
+var CellularTileSet = require('./CellularTileSet.js');
+var Tile = require('./Tile.js');
+var Agent = require('./Agent.js');
 
 	/**
 	 * The WorldGenerator is responsible for generating the world.
@@ -78,5 +76,4 @@ define([
 		}
 	}
 
-	return WorldGenerator;
-});
+	module.exports = WorldGenerator;

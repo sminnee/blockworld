@@ -1,19 +1,19 @@
-var WORLD_W = 256;
-var WORLD_H = 256;
+WORLD_W = 256;
+WORLD_H = 256;
 
-var CELL_SIZE = 8;
+CELL_SIZE = 8;
 
 // Directional constants used to look up results from getNeighboursFrom()
-var DIR_TL = 0;
-var DIR_TOP = 1;
-var DIR_TR = 2;
-var DIR_RIGHT = 3;
-var DIR_BR = 4;
-var DIR_BOTTOM = 5;
-var DIR_BL = 6;
-var DIR_LEFT = 7;
+DIR_TL = 0;
+DIR_TOP = 1;
+DIR_TR = 2;
+DIR_RIGHT = 3;
+DIR_BR = 4;
+DIR_BOTTOM = 5;
+DIR_BL = 6;
+DIR_LEFT = 7;
 
-var tileLookup = {
+tileLookup = {
 	grass: [
 							//TRBL - 0=diff, 1=same
 		null, //'grass',			//0000 - currently b0kred looking
@@ -34,20 +34,31 @@ var tileLookup = {
 		'grass',			//1111
 	],
 };
-
+/*
 require.config({
     paths: {
-    	"pixijs": "vendor/pixi.js/bin/pixi"
+    	"pixijs": "../vendor/pixi.js/bin/pixi"
+
+		"Animation":"Animation",
+		"JobQueue":"JobQueue",
+		"ViewManager":"ViewManager",
+		"ViewRenderer":"ViewRenderer",
+
+		"Agent": "../shared/Agent",
+		"CellularTileSet": "../shared/CellularTileSet",
+		"GameLoop":"../shared/GameLoop",
+		"Tile": "../shared/Tile",
+		"World": "../shared/World",
+		"WorldCell": "../shared/WorldCell",
+		"WorldGenerator": "../shared/WorldGenerator"
     }
 });
+*/
 
-require([
-	"pixijs",
-	"js/WorldGenerator.js",
-	"js/ViewManager.js",
-	"js/ViewRenderer.js",
-	"js/GameLoop.js"
-], function(PIXI, WorldGenerator, ViewManager, ViewRenderer, GameLoop) {
+var WorldGenerator = require('../shared/WorldGenerator.js');
+var ViewManager = require('./ViewManager.js');
+var ViewRenderer = require('./ViewRenderer.js');
+var GameLoop = require('../shared/GameLoop.js');
 
 	/// Generate a random world
 	var world = WorldGenerator.generate(WORLD_W, WORLD_H, 10000);
@@ -80,11 +91,12 @@ require([
 
 	loader.load();
 
-	var gameLoop = new GameLoop([
+	console.log(requestAnimationFrame);
+	var gameLoop = new GameLoop(requestAnimationFrame, [
 		viewManager,
 		world,
 		viewRenderer
 	]);
 
 	gameLoop.start();
-});
+

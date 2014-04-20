@@ -1,6 +1,3 @@
-define([
-	"pixijs",
-], function(PIXI) {
 
 	/**
 	 * The ViewManager is responsible for managing the user's interaction with the world.
@@ -108,5 +105,4 @@ define([
 		this.viewRenderer.viewportChanged();
 	}
 
-	return ViewManager;
-});
+	module.exports = ViewManager;

@@ -1,7 +1,5 @@
-define([
-	"pixijs",
-	"js/JobQueue.js"
-], function(PIXI, JobQueue) {
+
+var JobQueue = require('./JobQueue.js');
 
 	/**
 	 * The ViewRenderer is responsible looking after PIXI rendering.
@@ -117,5 +115,4 @@ define([
 		this.viewportRange = viewportRange;
 	}
 
-	return ViewRenderer;
-});
+	module.exports = ViewRenderer;

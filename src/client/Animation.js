@@ -1,6 +1,3 @@
-define([
-	"pixijs"
-], function(PIXI) {
 
 	var Animation = function(data, sprite) {
 		this.data = data;
@@ -36,5 +33,5 @@ define([
 		}	
 	};
 
-	return Animation;
-});
+	module.exports = Animation;
+

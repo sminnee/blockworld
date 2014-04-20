@@ -6,7 +6,9 @@ var app = express();
 
 app.use(express.static(path.join(__dirname, '../../public')));
 
-app.use('/js',express.static(path.join(__dirname, '../')));
+app.use('/js/client',express.static(path.join(__dirname, '../client')));
+app.use('/js/dist',express.static(path.join(__dirname, '../../dist')));
+app.use('/js/shared',express.static(path.join(__dirname, '../shared')));
 app.use('/js/vendor',express.static(path.join(__dirname, '../../bower_components')));
 
     app.use(function(err, req, res, next) {
@@ -17,11 +19,9 @@ app.use('/js/vendor',express.static(path.join(__dirname, '../../bower_components
         });
     });
 
-/*
 app.get('/', function(req, res){
   res.send('Hello World');
 });
-*/
 
 //var favicon = require('static-favicon');
 //var cookieParser = require('cookie-parser');
