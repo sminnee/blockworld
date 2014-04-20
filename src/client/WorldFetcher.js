@@ -12,7 +12,7 @@ var Agent = require('../shared/Agent.js');
 var WorldFetcher = function(world, viewRenderer) {
 	this.world = world;
 	this.viewRenderer = viewRenderer;
-	this.socket = io.connect('http://localhost:3000');
+	this.socket = io.connect('/');
 
 	__worldFetcher = this;
 
