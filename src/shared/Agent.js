@@ -58,8 +58,12 @@ Agent.prototype.getSprite = function() {
   return this.sprite;
 };
 
-Agent.prototype.tick = function(time) {
+Agent.prototype.tickClient = function() {
+  this.move(this.dX,this.dY);
   this.animation.tick();
+}
+
+Agent.prototype.tickServer = function(time) {
   this.move(this.dX,this.dY);
 
   if(Math.random() > 0.99) {

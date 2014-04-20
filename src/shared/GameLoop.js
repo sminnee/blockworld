@@ -1,26 +1,23 @@
+var Animation = require('animation').Animation;
+
 /**
  * GameLoop implements the game loop pattern.
  * Specifically, it will call tick(time) on every subsystem that is passed into the subsystems constructor arg.
  */
-GameLoop = function(requestAnimFrame, subsystems) {
-  this.requestAnimFrame = requestAnimFrame;
+GameLoop = function(subsystems) {
+  this.animation = new Animation({frame:'25ms'});
   this.subsystems = subsystems;
+
+  this.animation.on('tick', function(time) {
+    subsystems.forEach(function(subsystem) {
+      subsystem[0][subsystem[1]](time);
+    }); 
+  });
 }
 GameLoop.prototype.constructor = GameLoop;
 
 GameLoop.prototype.start = function() {
-  var __subsystems = this.subsystems;
-  var __raf = this.requestAnimFrame;
-
-  function animate(time) {
-    __subsystems.forEach(function(subsystem) {
-      subsystem.tick(time);
-    })
-
-    __raf(animate);
-  }
-
-  __raf(animate);
+  this.animation.start();
 }
 
 module.exports = GameLoop;

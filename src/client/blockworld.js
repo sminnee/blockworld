@@ -62,11 +62,10 @@ loader.onComplete = function() {
 
 loader.load();
 
-console.log(requestAnimationFrame);
-var gameLoop = new GameLoop(requestAnimationFrame, [
-  viewManager,
-  world,
-  viewRenderer
+var gameLoop = new GameLoop([
+  [viewManager,'tick'],
+  [world,'tickClient'],
+  [viewRenderer,'tick']
 ]);
 
 gameLoop.start();

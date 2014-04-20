@@ -23,10 +23,15 @@ World.prototype.setAgents = function(agents) {
   this.agents = agents;
 }
 
-
-World.prototype.tick = function(time) {
+World.prototype.tickClient = function(time) {
   this.agents.forEach(function(agent) {
-    agent.tick(time);
+    agent.tickClient(time);
+  });
+}
+
+World.prototype.tickServer = function(time) {
+  this.agents.forEach(function(agent) {
+    agent.tickServer(time);
   });
 }
 
