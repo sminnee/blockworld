@@ -11,8 +11,12 @@ var server = lr();
 var debug = true;
 
 gulp.task('scripts', function() {  
+
   gulp.src(['src/client/blockworld.js'])
-    .pipe(browserify({ debug: debug }))
+    .pipe(
+      browserify({ debug: debug })
+        .on('error', function(e) {console.log(e.message);})
+    )
     .pipe(gulp.dest('dist'))
     .pipe(refresh(server))
 })
