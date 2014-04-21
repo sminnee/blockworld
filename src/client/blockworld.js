@@ -42,7 +42,7 @@ var loader = new PIXI.AssetLoader([
 
 loader.onComplete = function() {
   if(world.getTileset()) {
-    world.getTileset().render(viewRenderer, 100);
+    //world.getTileset().render(viewRenderer, 100);
 
     // Link a terrain layer to the world's tileset
     var terrainLayer = new PIXI.DisplayObjectContainer();
