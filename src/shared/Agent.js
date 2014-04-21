@@ -60,9 +60,9 @@ Agent.prototype.getSprite = function() {
   return this.sprite;
 };
 
-Agent.prototype.tickClient = function(time, world) {
-  this.move(this.dX,this.dY);
-  this.animation.tick();
+Agent.prototype.tickClient = function(ticks) {
+  this.move(this.dX*ticks,this.dY*ticks);
+  this.animation.tick(ticks);
 }
 
 /**

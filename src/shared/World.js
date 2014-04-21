@@ -17,6 +17,7 @@ World = function(tileset, agents) {
   this.tileset = tileset;
   this.agents = agents;
   this.watchers = {};
+  this.heartbeatCounter = 0;
 }
 World.prototype.constructor = World;
 
@@ -34,18 +35,35 @@ World.prototype.setAgents = function(agents) {
   this.agents = agents;
 }
 
+var lastTick = null;
+
 World.prototype.tickClient = function(time) {
+  var thisTick = new Date().getTime();
+
+  var ticks = 1;
+  if(lastTick !== null) {
+    ticks = (thisTick-lastTick)/25;
+  }
+
   this.agents.forEach(function(agent) {
-    agent.tickClient(time, this);
+    agent.tickClient(ticks);
   });
+
+  lastTick = thisTick;
+
 }
 
 World.prototype.tickServer = function(time) {
   var changedAgents = [];
 
+  var __world = this;
+
+  // Refresh all clients every 40 ticks - every 1 second
+  this.heartbeatCounter = (this.heartbeatCounter + 1) % 40;
+
   // Tick all Agents
   this.agents.forEach(function(agent) {
-    if(agent.tickServer(time, this)) {
+    if(agent.tickServer(time, __world) || (__world.heartbeatCounter == 0)) {
       changedAgents.push(agent);
     }
   });

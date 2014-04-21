@@ -29,8 +29,8 @@ Animation.prototype.setSprite = function(sprite) {
   this.sprite.setTexture(this.getTexture());
 }
 
-Animation.prototype.tick = function(time) {
-  this.tickNum--;
+Animation.prototype.tick = function(ticks) {
+  this.tickNum -= ticks;
   if(this.tickNum < 0) {
     this.frameNum = (this.frameNum+1) % this.data.length;
     this.tickNum = this.data[this.frameNum][1];
