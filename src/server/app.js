@@ -31,7 +31,7 @@ DIR_LEFT = 7;
 var WorldGenerator = require('../shared/WorldGenerator.js');
 var GameLoop = require('../shared/GameLoop.js');
 
-var world = WorldGenerator.generate(WORLD_W, WORLD_H, 1000);
+var world = WorldGenerator.generate(WORLD_W, WORLD_H, 500);
 
 var gameLoop = new GameLoop([
   [world,'tickServer']
@@ -62,6 +62,7 @@ app.get('/api/agents', function(req, res){
 });
 
 var io = require('socket.io').listen(server);
+io.set('log level', 1);
 io.sockets.on('connection', function (socket) {
 
   var watcherID = null;

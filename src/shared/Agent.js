@@ -72,6 +72,17 @@ Agent.prototype.tickClient = function(ticks) {
 Agent.prototype.tickServer = function(time, world) {
   this.move(this.dX,this.dY);
 
+  var cell = world.getTileset().getCell(this.i,this.j);
+  if(!cell || cell.type != 'grass') {
+    if(this.dX < 0) this.setDirection(DIR_RIGHT);
+    else if(this.dX > 0) this.setDirection(DIR_LEFT);
+    else if(this.dY < 0) this.setDirection(DIR_BOTTOM);
+    else if(this.dY > 0) this.setDirection(DIR_TOP);
+
+    this.move(this.dX, this.dY);
+    return true;
+  }
+
   if(Math.random() > 0.99) {
     this.setDirection(Math.floor(Math.random()*4)*2+1);
     return true;

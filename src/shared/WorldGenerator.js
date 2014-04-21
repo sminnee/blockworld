@@ -48,10 +48,15 @@ WorldGenerator = {
 
     var animals = ['dog','cat','chicken','sheep','cow','horse','wolf','butterfly'];
 
+     var agentI, agentJ;
     for(i=0;i<numAgents;i++) {
-      agents.push(new Agent(
-        Math.floor(Math.random()*WORLD_W),
-        Math.floor(Math.random()*WORLD_H),
+      agentI = agentJ = null;
+      while(agentI === null || tileset.getCell(agentI,agentJ).type != 'grass') {
+        agentI = Math.floor(Math.random()*WORLD_W);
+        agentJ = Math.floor(Math.random()*WORLD_H);
+      }
+
+      agents.push(new Agent(agentI, agentJ,
         animals[Math.floor(Math.random()*animals.length)]
       ));
     }
