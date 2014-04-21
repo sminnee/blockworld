@@ -95,10 +95,10 @@ ViewRenderer.prototype.viewportChanged = function() {
   var maxY = minY + this.renderer.height / scale;
 
   // Turn these into tileset cell coordinates: i,j
-  var minI = Math.max(0,Math.floor(minX/40));
-  var minJ = Math.max(0,Math.floor(minY/40));
-  var maxI = Math.floor(maxX/40);
-  var maxJ = Math.floor(maxY/40);
+  var minI = Math.max(0,Math.floor(minX/TILE_SIZE));
+  var minJ = Math.max(0,Math.floor(minY/TILE_SIZE));
+  var maxI = Math.floor(maxX/TILE_SIZE);
+  var maxJ = Math.floor(maxY/TILE_SIZE);
 
   // Don't bother triggering if the viewport range hasn't actually moved
   var viewportRange = minI+','+minJ+','+maxI+','+maxJ;

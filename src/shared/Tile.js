@@ -4,7 +4,7 @@
  * i,j are tile, rather than pixel, coordinates
  */
 var Tile = function(i,j, type) {
-  this.type = (type == 'grass') ? 'grass' : 'rock';
+  this.type = type;
   this.i = i;
   this.j = j;
   this.x = 0;
@@ -16,25 +16,28 @@ var Tile = function(i,j, type) {
 Tile.prototype.constructor = Tile;
 
 var tileLookup = {
-  grass: [
-              //TRBL - 0=diff, 1=same
+  grass : 'grass',
+  swamp : [
+                          //TRBL - 0=diff, 1=same
     null, //'grass',      //0000 - currently b0kred looking
     null, //'grass',      //0001 - currently b0kred looking
     null, //'grass',      //0010 - currently b0kred looking
-    'grass-tr-rock',  //0011
+    'swamp-tr-grass',      //0011
     null, //'grass',      //0100 - currently b0kred looking
     null, //'rock-bottom-grass',//0101 - currently b0kred looking
-    'grass-tl-rock',  //0110
-    'rock-bottom-grass',//0111
+    'swamp-tl-grass',  //0110
+    'swamp-top-grass',//0111
     null, //'grass',      //1000 - currently b0kred looking
-    'grass-br-rock',  //1001
+    'swamp-br-grass',  //1001
     null, //'rock-left-grass',  //1010 - currently b0kred looking
-    'rock-left-grass',  //1011
-    'rock-tr-grass',  //1100
-    'rock-top-grass', //1101
-    'rock-right-grass', //1110
-    'grass',      //1111
-  ],
+    'swamp-right-grass',  //1011
+    'swamp-bl-grass',  //1100
+    'swamp-bottom-grass', //1101
+    'swamp-left-grass', //1110
+    [ 
+      'swamp-tlconcave-grass', 'swamp-trconcave-grass', 'swamp-brconcave-grass', 'swamp-blconcave-grass', 'swamp'
+    ]
+  ]
 };
 
 Tile.prototype.setTileset = function(tileset) {
@@ -52,16 +55,16 @@ Tile.prototype.setPosition = function(x,y) {
 
 Tile.prototype.getDisplayObject = function() {
   var textureName = null;
-  if(this.type == 'grass') {
+  if(typeof tileLookup[this.type] == 'string') {
+    textureName = tileLookup[this.type];
+  } else {
     var neighbours = this.getNeighboursFrom(this.tileset);
     var textureName = this.getTextureNameFrom(neighbours);
     if(textureName === null) textureName = this.type;
-  } else {
-    textureName = this.type;
   }
 
   if(this.displayObject === null) {
-    this.displayObject = new PIXI.Sprite.fromFrame(textureName);
+    this.displayObject = textureName ? new PIXI.Sprite.fromFrame(textureName) : new PIXI.DisplayObject;
     this.displayObject.x = this.x;
     this.displayObject.y = this.y;
     this.displayObject.i = this.i;
@@ -82,7 +85,7 @@ Tile.prototype.getNeighboursFrom = function(worldCells) {
     worldCells.getCell(this.i+1,this.j),   // 3; right
     worldCells.getCell(this.i+1,this.j+1), // 4: bottom-right
     worldCells.getCell(this.i,this.j+1),   // 5: bottom
-    worldCells.getCell(this.i-1,this.j), // 6: bottom-left
+    worldCells.getCell(this.i-1,this.j+1), // 6: bottom-left
     worldCells.getCell(this.i-1,this.j),   // 7: left
   ];
 };
@@ -99,7 +102,18 @@ Tile.prototype.getTextureNameFrom = function(neighbours) {
   if(!neighbours[DIR_BOTTOM] || neighbours[DIR_BOTTOM].type == this.type) lookupIdx += 2;
   if(!neighbours[DIR_LEFT] || neighbours[DIR_LEFT].type == this.type) lookupIdx += 1;
 
-  return tileLookup[this.type][lookupIdx]; 
+  var result = tileLookup[this.type][lookupIdx];
+
+  // Diagonals count - look for differences
+  if(result !== null && typeof result != 'string') {
+    if(neighbours[DIR_TL] && neighbours[DIR_TL].type != this.type) return result[0];
+    else if(neighbours[DIR_TR] && neighbours[DIR_TR].type != this.type) return result[1];
+    else if(neighbours[DIR_BR] && neighbours[DIR_BR].type != this.type) return result[2];
+    else if(neighbours[DIR_BL] && neighbours[DIR_BL].type != this.type) return result[3];
+    else return result[4];
+  }
+
+  return result;
 };
 
 /**

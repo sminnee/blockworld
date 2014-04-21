@@ -64,7 +64,7 @@ fs.readFile(inputFile, 'utf8', function (err, inputText) {
     cols.forEach(function(frameName) {
 
       // Add a frame
-      output.frames[frameName] = {
+      if(frameName != '-') output.frames[frameName] = {
         "frame": {"x":x,"y":y,"w":sizeX,"h":sizeY},
         "rotated": false,
         "trimmed": false,

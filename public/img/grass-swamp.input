@@ -1,0 +1,25 @@
+{
+"img": "grass-swamp.png",
+"size": "20x20",
+"gap": "20x20"
+}
+
+swamp-tl-grass
+swamp-top-grass
+swamp-tr-grass
+
+swamp-left-grass
+swamp
+swamp-right-grass
+
+swamp-bl-grass
+swamp-bottom-grass
+swamp-br-grass
+
+grass
+swamp-brconcave-grass
+swamp-blconcave-grass
+
+-
+swamp-trconcave-grass
+swamp-tlconcave-grass

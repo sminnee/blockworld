@@ -17,6 +17,7 @@ WORLD_W = 256;
 WORLD_H = 256;
 
 CELL_SIZE = 8;
+TILE_SIZE = 20;
 
 DIR_TL = 0;
 DIR_TOP = 1;

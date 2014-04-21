@@ -6,6 +6,7 @@
 WORLD_W = 256;
 WORLD_H = 256;
 
+TILE_SIZE = 20;
 CELL_SIZE = 8;
 
 // Directional constants used to look up results from getNeighboursFrom()
@@ -37,7 +38,8 @@ var viewManager = new ViewManager(viewRenderer, viewRenderer.getWorldLayer());
 
 var loader = new PIXI.AssetLoader([
   "img/animal-sprites.json",
-  "img/grass-rock.json",
+  "img/grass-swamp.json"
+  //"img/grass-rock.json",
 ]);
 
 loader.onComplete = function() {

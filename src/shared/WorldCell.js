@@ -32,15 +32,15 @@ WorldCell.prototype.getContainer = function() {
 WorldCell.prototype.getSprite = function() {
   if(this.sprite === null) {
     this.sprite = new PIXI.Sprite(this.getRenderer());
-    this.sprite.x = this.i*40*this.cellSize;
-    this.sprite.y = this.j*40*this.cellSize;
+    this.sprite.x = this.i*TILE_SIZE*this.cellSize;
+    this.sprite.y = this.j*TILE_SIZE*this.cellSize;
   }
   return this.sprite;
 }
 
 WorldCell.prototype.getRenderer = function() {
   if(this.renderer === null) {
-    this.renderer = new PIXI.RenderTexture(this.cellSize*40, this.cellSize*40);
+    this.renderer = new PIXI.RenderTexture(this.cellSize*TILE_SIZE, this.cellSize*TILE_SIZE);
   }
   return this.renderer;
 }
@@ -53,7 +53,7 @@ WorldCell.prototype.addChild = function(child) {
   var offsetI = child.i - this.i*this.cellSize;
   var offsetJ = child.j - this.j*this.cellSize;
   
-  child.setPosition(offsetI * 40, offsetJ * 40);
+  child.setPosition(offsetI * TILE_SIZE, offsetJ * TILE_SIZE);
   this.tiles.push(child);
 
   if(this.container !== null) {

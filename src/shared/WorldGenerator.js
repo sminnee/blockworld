@@ -40,7 +40,7 @@ WorldGenerator = {
     // Initialize ground - scattering a few rocks
     for(i=0;i<w;i++) {
       for(j=0;j<h;j++) {
-        tileset.addChild(new Tile(i,j, data[i][j] >= 0.5 ? 'rock':'grass'));
+        tileset.addChild(new Tile(i,j, data[i][j] >= 0.5 ? 'swamp':'grass'));
       }
     }
 

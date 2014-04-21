@@ -37,8 +37,8 @@ function animationsFor(animal) {
 var Agent = function(i,j,animal) {
   this.i = i;
   this.j = j;
-  this.x = i*40;
-  this.y = j*40;
+  this.x = i*TILE_SIZE;
+  this.y = j*TILE_SIZE;
   this.dX = 0;
   this.dY = 0;
   this.animationSet = animationsFor(animal);
@@ -91,8 +91,8 @@ Agent.prototype.move = function(x,y) {
   this.x += x;
   this.y += y;
 
-  this.i = Math.floor(this.x/40);
-  this.j = Math.floor(this.y/40);
+  this.i = Math.floor(this.x/TILE_SIZE);
+  this.j = Math.floor(this.y/TILE_SIZE);
 
   if(this.sprite !== null) {
     this.sprite.x = this.x;
@@ -154,8 +154,8 @@ Agent.prototype.updateFromJSON = function(data) {
 
   this.x = data.x;
   this.y = data.y;
-  this.i = Math.floor(this.x/40);
-  this.j = Math.floor(this.y/40);
+  this.i = Math.floor(this.x/TILE_SIZE);
+  this.j = Math.floor(this.y/TILE_SIZE);
   this.dX = data.dX;
   this.dY = data.dY;
 
@@ -167,8 +167,8 @@ Agent.prototype.updateFromJSON = function(data) {
  * @static
  */
 Agent.fromJSON = function(data) {
-  var i = Math.floor(data.x/40);
-  var j = Math.floor(data.y/40);
+  var i = Math.floor(data.x/TILE_SIZE);
+  var j = Math.floor(data.y/TILE_SIZE);
   var agent = new Agent(i,j,null);
 
   agent.identifier = data.identifier;
