@@ -44,7 +44,7 @@ WorldGenerator = {
       }
     }
 
-    var agents = [];
+    world = new World(tileset);
 
     var animals = ['dog','cat','chicken','sheep','cow','horse','wolf','butterfly'];
 
@@ -56,12 +56,13 @@ WorldGenerator = {
         agentJ = Math.floor(Math.random()*WORLD_H);
       }
 
-      agents.push(new Agent(agentI, agentJ,
+      world.addAgent(new Agent(agentI, agentJ,
         animals[Math.floor(Math.random()*animals.length)]
       ));
     }
 
-    return new World(tileset, agents);
+
+    return world;
   }
 };
 

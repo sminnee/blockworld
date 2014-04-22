@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 /**
  * The ViewManager is responsible for managing the user's interaction with the world.
  * It interacts with three components
@@ -22,7 +24,9 @@ ViewManager = function(viewRenderer) {
 
 ViewManager.prototype.constructor = ViewManager;
 
-
+ViewManager.prototype.setCodeAPI = function(codeAPI) {
+  this.codeAPI = codeAPI;
+}
 /**
  * Return the position of the click.
  * @param data The data passed to the PIXI event handler
@@ -129,6 +133,78 @@ ViewManager.prototype.stageMouseMove = function(data) {
 };
 
 /**
+ * Register a new agent sprite to be managed
+ */
+ViewManager.prototype.registerAgentSprite = function(sprite, agent) {
+  var __viewManager = this;
+  sprite.interactive = true;
+  sprite.buttonMode = true;
+  sprite.click = function() {
+    __viewManager.clickAgent(agent);
+  }
+}
+
+/**
+ * Click handler for agents.
+ * Opens a code editing window, and follows the agent
+ */
+ViewManager.prototype.clickAgent = function(agent) {
+  var __viewManager = this;
+  this.followingAgent = {
+    'agent': agent,
+    'offset': {
+      'x': -this.viewRenderer.getWidth()/4,
+      'y': -this.viewRenderer.getHeight()/2
+    }
+  }
+
+  // Show the edit window
+  if(this.$editWindow) {
+    this.$editWindow.show();
+  } else {
+    $(document.body).append('<div id="editor"><h1>Edit agent</h1><p>Agent ID: <span class="agentID"></span></p><textarea></textarea><div class="buttons"><button class="save">Save</button><button class="close">Close</button></div></div>')
+    $('#editor textarea').width($('#editor').width() - 32-6);
+    this.$editWindow = $('#editor');
+  }
+
+  var $editWindow = this.$editWindow;
+  var codeAPI = this.codeAPI;
+  // Show agent ID
+  $editWindow.find('.agentID').html(agent.identifier);
+
+  // Show code
+  if(codeAPI) codeAPI.getCode(agent.identifier, function(code) {
+    $editWindow.find('textarea').text(code);  
+  });
+
+  // Save handler
+  $editWindow.find('.save').click(function() {
+    if(__viewManager.codeAPI) {
+      __viewManager.codeAPI.setCode(agent.identifier, $editWindow.find('textarea').val(), function(success) {
+        if(success) {
+          $editWindow.find('.save').text("Saved!").attr('style', 'color: green');
+        
+        } else {
+          $editWindow.find('.save').text("Could not save!").attr('style', 'color: red');
+
+        }
+        setTimeout(function() {
+          $editWindow.find('.save').text("Save").attr('style', '');
+        }, 2000);
+      });
+    }
+  });
+
+  // Close handler
+  $editWindow.find('.close').click(function() {
+    $editWindow.hide();
+    __viewManager.followingAgent = null;
+  });
+
+  
+}
+
+/**
  * KeyDown handler for view
  */
 ViewManager.prototype.onkeydown = function(e) {
@@ -159,6 +235,11 @@ ViewManager.prototype.onkeydown = function(e) {
  */
 ViewManager.prototype.tick = function(time) {
   if(this.targetScale !== null) this.scaleTick();
+  if(this.followingAgent) {
+    this.worldLayer.x = -this.followingAgent.agent.sprite.x - this.followingAgent.offset.x;
+    this.worldLayer.y = -this.followingAgent.agent.sprite.y - this.followingAgent.offset.y;
+    this.viewRenderer.viewportChanged();
+  }
 }
 
 /**

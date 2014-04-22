@@ -30,8 +30,11 @@ DIR_LEFT = 7;
 
 var WorldGenerator = require('../shared/WorldGenerator.js');
 var GameLoop = require('../shared/GameLoop.js');
+var CodeManager = require('./CodeManager.js');
 
 var world = WorldGenerator.generate(WORLD_W, WORLD_H, 500);
+
+var agentCodeManager = new CodeManager(world);
 
 var gameLoop = new GameLoop([
   [world,'tickServer']
@@ -47,11 +50,13 @@ app.use(function(err, req, res, next) {
   });
 });
 
+// Get tiles
 app.get('/api/tiles', function(req, res){
   res.setHeader('Content-type', 'application/json');
   res.send(JSON.stringify(world.getTileset().toJSON()));
 });
 
+// Get all active agents (not used)
 app.get('/api/agents', function(req, res){
   res.setHeader('Content-type', 'application/json');
   var output = [];
@@ -59,6 +64,21 @@ app.get('/api/agents', function(req, res){
     output.push(agent.toJSON());
   });
   res.send(JSON.stringify(output));
+});
+
+// Code load/save
+app.get('/api/agent/:id/code', function(req, res){
+  res.setHeader('Content-type', 'text/plain');
+  res.send(agentCodeManager.getCode(req.params.id));
+});
+app.put('/api/agent/:id/code', function(req, res){
+  // Get the body with the raw-body library
+  // God, why is this so complicated. It's just a PUT body.
+  require('raw-body')(req, {}, function(err, body) {
+    if(err) throw err;
+    agentCodeManager.setCode(req.params.id, '' + body);
+    res.send('ok');
+  });
 });
 
 var io = require('socket.io').listen(server);

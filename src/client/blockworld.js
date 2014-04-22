@@ -24,6 +24,7 @@ var WorldFetcher = require('./WorldFetcher.js');
 var ViewManager = require('./ViewManager.js');
 var ViewRenderer = require('./ViewRenderer.js');
 var GameLoop = require('../shared/GameLoop.js');
+var AgentAPIAccessor = require('./AgentAPIAccessor.js');
 
 // Create a renderer to display the world
 var viewRenderer = new ViewRenderer();
@@ -33,8 +34,19 @@ var world = new World();
 var worldFetcher = new WorldFetcher(world, viewRenderer);
 worldFetcher.loadWorld();
 
+// When new agents appear in the world, introduce them to the renderer and the manager
+world.on('addAgent', function(agent) {
+  var sprite = agent.getSprite();
+  viewRenderer.getWorldLayer().addChild(sprite);
+  viewManager.registerAgentSprite(sprite, agent);
+
+})
+
 // Create a view managaer to navigate the rendered world
 var viewManager = new ViewManager(viewRenderer, viewRenderer.getWorldLayer());
+
+// Simple REST API interaction
+viewManager.setCodeAPI(new AgentAPIAccessor);
 
 var loader = new PIXI.AssetLoader([
   "img/animal-sprites.json",
@@ -53,9 +65,9 @@ loader.onComplete = function() {
 
     viewRenderer.renderOnDemand(worldFetcher, null);
 
-
     world.agents.forEach(function(agent) {
-      viewRenderer.getWorldLayer().addChild(agent.getSprite());
+      var sprite = agent.getSprite();
+      viewRenderer.getWorldLayer().addChild(sprite);
     });
 
     viewRenderer.viewportChanged();

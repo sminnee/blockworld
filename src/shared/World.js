@@ -1,3 +1,5 @@
+var EventEmitter = require('events').EventEmitter;
+
 /**
  * The World object contains all terrain and agents that make up the world.
  * The world can exist without any user interaction or display.
@@ -19,6 +21,8 @@ World = function(tileset, agents) {
   this.watchers = {};
   this.heartbeatCounter = 0;
 }
+
+World.prototype = Object.create(EventEmitter.prototype);
 World.prototype.constructor = World;
 
 World.prototype.setTileset = function(tileset) {
@@ -33,6 +37,13 @@ World.prototype.getAgents = function() {
 }
 World.prototype.setAgents = function(agents) {
   this.agents = agents;
+}
+World.prototype.addAgent = function(agent) {
+  this.agents[agent.identifier] = agent;
+  this.emit('addAgent', agent);
+}
+World.prototype.getAgentByID = function(identifier) {
+  return this.agents[identifier];
 }
 
 var lastTick = null;

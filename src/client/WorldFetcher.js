@@ -29,9 +29,10 @@ WorldFetcher.prototype.constructor = WorldFetcher;
  */
 WorldFetcher.prototype.loadWorld = function() {
 	__world = this.world;
+	//this.world.setTileset(new CellularTileSet(256,256,8))
 	$.getJSON('/api/tiles', function(data) {
 		__world.setTileset(CellularTileSet.fromJSON(data));
-	})
+	});
 };
 
 WorldFetcher.prototype.refreshParentContainer = function(viewRenderer, dummy, minI, minJ, maxI, maxJ) {
@@ -49,6 +50,7 @@ WorldFetcher.prototype.refreshParentContainer = function(viewRenderer, dummy, mi
 WorldFetcher.prototype.processWorldChanges = function(changes) {
 	var __agents = this.world.getAgents();
 	var __viewRenderer = this.viewRenderer;
+	var __world = this.world;
 
 	changes.forEach(function(change) {
 		switch(change.type) {
@@ -59,8 +61,7 @@ WorldFetcher.prototype.processWorldChanges = function(changes) {
 
 			// Create
 			} else {
-				__agents[change.agent.identifier] = Agent.fromJSON(change.agent);
-				__viewRenderer.getWorldLayer().addChild(__agents[change.agent.identifier].getSprite());
+				__world.addAgent(Agent.fromJSON(change.agent));
 			}
 			break;
 		}

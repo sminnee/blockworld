@@ -1,13 +1,49 @@
 <html>
 <head>
-    <title>BlockWorld - A work in progress</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000000;
-        }
-    </style>
+<title>BlockWorld - A work in progress</title>
+<style>
+  * {
+    font-family: Helvetica, Arial;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #000000;
+  }
+  #editor {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    right: 16px;
+    bottom: 16px;
+    background-color: white;
+    border: 1px #CCC solid;
+    padding: 0;
+  }
+    #editor h1 {
+      margin: 16px 16px 0 16px;
+      font-size: 24px;
+      line-height: 32px;
+    }
+    #editor p {
+      margin: 0 18px;
+      font-size: 12px;
+      line-height: 16px;
+    }
+    #editor textarea {
+      position: absolute;
+      top: 64px;
+      left: 16px;
+      right: 16px;
+      bottom: 48px;
+    }
+    #editor .buttons {
+      bottom: 16px;
+      left: 16px;
+      height: 16px;
+      position: absolute;
+    }
+</style>
 </head>
 <body>
 <script src="js/vendor/pixi.js/bin/pixi.js"></script>
