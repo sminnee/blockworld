@@ -17,16 +17,17 @@ WorldGenerator = {
     var i,j,c;
 
     var data = sumArrays([
-      noiseArray(w,h,64,-1,1),
-      noiseArray(w,h,32,-1,1),
-      noiseArray(w,h,16,-1,1),
-      noiseArray(w,h,8,-1,1),
-      noiseArray(w,h,4,-1,1),
-      noiseArray(w,h,2,-0.3,0.3),
-      noiseArray(w,h,1,-0.3,0.3),
+      noiseArray(w/2,h/2,64,-1,1),
+      noiseArray(w/2,h/2,32,-1,1),
+      noiseArray(w/2,h/2,16,-1,1),
+      noiseArray(w/2,h/2,8,-1,1),
+      noiseArray(w/2,h/2,4,-1,1),
+      noiseArray(w/2,h/2,2,-1,1),
+      noiseArray(w/2,h/2,1,-1,1),
     ]);
 
     // Ensure rocks are in 2x2 blocks at the smallest
+    /*
     for(i=1;i<w;i++) {
       for(j=1;j<h;j++) {
         if(data[i][j] >= 0.5) {
@@ -36,11 +37,16 @@ WorldGenerator = {
         }
       }
     }
+    */
 
     // Initialize ground - scattering a few rocks
-    for(i=0;i<w;i++) {
-      for(j=0;j<h;j++) {
-        tileset.addChild(new Tile(i,j, data[i][j] >= 0.5 ? 'swamp':'grass'));
+    for(i=0;i<w/2;i++) {
+      for(j=0;j<h/2;j++) {
+        var type = data[i][j] >= 0 ? 'swamp':'grass';
+        tileset.addChild(new Tile(i*2,j*2, type));
+        tileset.addChild(new Tile(i*2+1,j*2, type));
+        tileset.addChild(new Tile(i*2,j*2+1, type));
+        tileset.addChild(new Tile(i*2+1,j*2+1, type));
       }
     }
 
