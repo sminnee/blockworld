@@ -61,7 +61,6 @@ Agent.prototype.getSprite = function() {
 };
 
 Agent.prototype.setCode = function(code) {
-  console.log('updating code for ' + this.identifier);
   this.animationSet = code.animations;
   this.tickServerCore = code.tick;
 }
@@ -77,7 +76,7 @@ Agent.prototype.tickClient = function(ticks) {
  */
 Agent.prototype.tickServer = function(time, world) {
   if(this.tickServerCore) {
-    this.tickServerCore(this, world);
+    return this.tickServerCore(this, world);
   }
 };
 

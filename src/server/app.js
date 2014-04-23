@@ -101,9 +101,14 @@ io.sockets.on('connection', function (socket) {
     world.refreshWatcher(watcherID)
   });
 
-
+  // Ping handler, used to calibrate timing
+  socket.on('ping' ,function(data) {
+    data.server = (new Date()).getTime();
+    socket.emit('pong', data);
+  });
 
 });
+
 
 //var favicon = require('static-favicon');
 //var cookieParser = require('cookie-parser');

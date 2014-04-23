@@ -21,7 +21,45 @@ var WorldFetcher = function(world, viewRenderer) {
 	this.socket.on('worldChanges', function (data) {
 		__worldFetcher.processWorldChanges(data);
 	});
+
+	// This will store the calculated timing offset
+	this.timeOffset = 0;
+
+	// Private arrays to store in-progress timing offset data
+	var timeOffsets = [];
+
+	this.socket.on('pong', function (data) {
+		data.end = (new Date()).getTime();
+		data.delay = (data.end - data.start)/2;
+
+		// Calculate the time offset; add to server times before comparing to client times
+		data.timeOffset = data.start + data.delay - data.server;
+		timeOffsets.push(data.timeOffset);
+
+		// Use the average last 5 values to set this.timeOffset. This is a magic number derived from watching
+		// the prod server.  Analysing the std dev of the data would be a better approach.
+		if(timeOffsets.length > 5) {
+			var i,sum=0;
+			for(i=1;i<=5;i++) {
+				sum += timeOffsets[timeOffsets.length-i];
+			}
+			__worldFetcher.timeOffset = sum/5;
+		}
+
+		console.log(timeOffsets);
+		console.log(__worldFetcher.timeOffset);
+	});
+
+	// Repeated ping handler; uses setTimeout() to delay subsequent pings
+	var ping = function(socket, count) {
+		socket.emit('ping', { 'start': (new Date()).getTime() });
+		if(count > 1) setTimeout(function() { ping(socket, count-1); }, 1000);
+	}
+
+	// Run 5 pings and get the average
+	ping(this.socket, 10);
 }
+
 WorldFetcher.prototype.constructor = WorldFetcher;
 
 /**
@@ -62,7 +100,7 @@ WorldFetcher.prototype.processWorldChanges = function(changes) {
 			// Update
 			if(agent = __agents[change.agent.identifier]) {
 				if(!agent.lastServerUpdate || agent.lastServerUpdate < timestamp) {
-					console.log(agent.identifier, timestamp)
+					//console.log(agent.identifier, timestamp, (new Date()).getTime() - timestamp);
 					agent.updateFromJSON(change.agent);
 					agent.lastServerUpdate = timestamp;
 				} else {
