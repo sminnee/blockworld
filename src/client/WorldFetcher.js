@@ -52,12 +52,22 @@ WorldFetcher.prototype.processWorldChanges = function(changes) {
 	var __viewRenderer = this.viewRenderer;
 	var __world = this.world;
 
-	changes.forEach(function(change) {
+	var timestamp = changes.timestamp;
+
+	changes.changes.forEach(function(change) {
+		var agent;
+
 		switch(change.type) {
 		case 'agentUpdate':
 			// Update
-			if(__agents[change.agent.identifier]) {
-				__agents[change.agent.identifier].updateFromJSON(change.agent);
+			if(agent = __agents[change.agent.identifier]) {
+				if(!agent.lastServerUpdate || agent.lastServerUpdate < timestamp) {
+					console.log(agent.identifier, timestamp)
+					agent.updateFromJSON(change.agent);
+					agent.lastServerUpdate = timestamp;
+				} else {
+					console.log('stale', agent.identifier, timestamp)
+				}
 
 			// Create
 			} else {

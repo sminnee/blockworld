@@ -95,7 +95,10 @@ World.prototype.tickServer = function(time) {
     })
 
     if(watcherChanges.length) {
-      watcher.callback(watcherChanges);
+      watcher.callback({
+        'timestamp': (new Date()).getTime(),
+        'changes': watcherChanges
+      });
     } 
   }
 }
@@ -147,7 +150,10 @@ World.prototype.refreshWatcher = function(watcherID) {
     }
   });
   
-  watcher.callback(watcherChanges);
+  watcher.callback({
+    'timestamp': (new Date()).getTime(),
+    'changes': watcherChanges
+  });
 }
 /**
  * Set visible agents in a watcher
