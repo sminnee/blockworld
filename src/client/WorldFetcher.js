@@ -89,6 +89,7 @@ WorldFetcher.prototype.processWorldChanges = function(changes) {
 	var __agents = this.world.getAgents();
 	var __viewRenderer = this.viewRenderer;
 	var __world = this.world;
+	var __worldFetcher = this;
 
 	var timestamp = changes.timestamp;
 
@@ -96,6 +97,16 @@ WorldFetcher.prototype.processWorldChanges = function(changes) {
 		var agent;
 
 		switch(change.type) {
+		// List the visible agents by their identifiers; delete the rest
+		case 'setVisibleAgents':
+			__agents.forEach(function(agent) {
+				if(change.identifiers.indexOf(agent.identifier) == -1) {
+					delete __agents[agent.identifier];
+				}
+			});
+			break;
+
+		// Update or create an agent
 		case 'agentUpdate':
 			// Update
 			if(agent = __agents[change.agent.identifier]) {

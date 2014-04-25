@@ -30,7 +30,7 @@ WorldWatcher.prototype.constructor = WorldWatcher;
  * Given a list of world-wide agents, pass the ones within this watcher's viewport
  * through as a worldChanged event
  */
-WorldWatcher.prototype.processAgents = function(changedAgents, refreshTimeout) {
+WorldWatcher.prototype.processAgents = function(changedAgents, refreshTimeout, updateVisibleAgents) {
   // The viewport hasn't been configured yet; do nothing
   if(this.minI == null) return;
 
@@ -51,14 +51,19 @@ WorldWatcher.prototype.processAgents = function(changedAgents, refreshTimeout) {
       }
     }
   }.bind(this));
+  
+  if(updateVisibleAgents) watcherChanges.push({
+    'type': 'setVisibleAgents',
+    'identifiers': this.visibleAgents()
+  });
 
   if(watcherChanges.length) {
-    console.log('worldChanged', timestamp, watcherChanges.length);
+
     this.emit('worldChanged', {
       'timestamp': (new Date()).getTime(),
       'changes': watcherChanges
     });
-  }    
+  }
 }
 
 /**
@@ -72,20 +77,13 @@ WorldWatcher.prototype.setViewport = function(minI, minJ, maxI, maxJ) {
 
   // Update all agents now in the viewport, unless they have already been refreshed in the last 
   // 1s (1000ms)
-  this.processAgents(this.world.getAgents(), 1000);
-}
-
-/**
- * Refresh a watcher, resending all agent data to it
- */
-WorldWatcher.prototype.refreshWatcher = function(watcherID) {
-  this.processAgents(this.world.getAgents(), 1000);
+  this.processAgents(this.world.getAgents(), 1000, true);
 }
 
 /**
  * Return an array of identifiers of the agents within the viewport
  */
-WorldWatcher.visibleAgents = function() {
+WorldWatcher.prototype.visibleAgents = function() {
   visibleAgents = [];
 
   this.world.getAgents().forEach(function(agent) {
