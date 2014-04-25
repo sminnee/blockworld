@@ -39,8 +39,14 @@ world.on('addAgent', function(agent) {
   var sprite = agent.getSprite();
   viewRenderer.getWorldLayer().addChild(sprite);
   viewManager.registerAgentSprite(sprite, agent);
+});
 
-})
+// Similarly, when they disappear, remove the sprite
+world.on('removeAgent', function(agent) {
+  var sprite = agent.getSprite();
+  viewRenderer.getWorldLayer().removeChild(sprite);
+  viewManager.registerAgentSprite(sprite, agent);
+});
 
 // Create a view managaer to navigate the rendered world
 var viewManager = new ViewManager(viewRenderer, viewRenderer.getWorldLayer());

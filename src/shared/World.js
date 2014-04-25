@@ -4,7 +4,7 @@ var EventEmitter = require('events').EventEmitter;
  * The World object contains all terrain and agents that make up the world.
  * The world can exist without any user interaction or display.
  * 
- * Emits: agentsUpdate, addAgent
+ * Emits: agentsUpdate, addAgent, removeAgent
  */
 World = function(tileset, agents) {
  if(!agents) {
@@ -44,6 +44,11 @@ World.prototype.addAgent = function(agent) {
 
   this.emit('addAgent', agent);
   this.emit('agentsUpdate', [agent]);
+}
+World.prototype.removeAgent = function(identifier) {
+  var agent = this.agents[identifier];
+  delete this.agents[identifier];
+  this.emit('removeAgent', agent);
 }
 World.prototype.getAgentByID = function(identifier) {
   return this.agents[identifier];

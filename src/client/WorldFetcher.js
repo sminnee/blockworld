@@ -101,7 +101,7 @@ WorldFetcher.prototype.processWorldChanges = function(changes) {
 		case 'setVisibleAgents':
 			__agents.forEach(function(agent) {
 				if(change.identifiers.indexOf(agent.identifier) == -1) {
-					delete __agents[agent.identifier];
+					__world.removeAgent(agent.identifier);
 				}
 			});
 			break;
