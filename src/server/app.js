@@ -31,6 +31,7 @@ DIR_LEFT = 7;
 var WorldGenerator = require('../shared/WorldGenerator.js');
 var GameLoop = require('../shared/GameLoop.js');
 var CodeManager = require('./CodeManager.js');
+var WorldWatcher = require('./WorldWatcher.js');
 
 var world = WorldGenerator.generate(WORLD_W, WORLD_H, 500);
 
@@ -84,23 +85,18 @@ app.put('/api/agent/:id/code', function(req, res){
 var io = require('socket.io').listen(server);
 io.set('log level', 1);
 io.sockets.on('connection', function (socket) {
-
-  var watcherID = null;
+  var watcher = new WorldWatcher(world);
 
   // Update this client's viewport 
   socket.on('setViewport', function (data) {
-    // TODO: Pull initial state
-
-    // Create a world watcher to handle changes occurring within that window
-    if(watcherID) world.removeWatcher(watcherID);
-
-    watcherID = world.addWatcher(data.minI, data.minJ, data.maxI, data.maxJ, function(changes) {
-      socket.emit('worldChanges', changes);
-    });
-
-    world.refreshWatcher(watcherID)
+    watcher.setViewport(data.minI, data.minJ, data.maxI, data.maxJ);
   });
 
+  // Receive world changes back
+  watcher.on('worldChanged', function(changes) {
+    socket.emit('worldChanged', changes);
+  });
+  
   // Ping handler, used to calibrate timing
   socket.on('ping' ,function(data) {
     data.server = (new Date()).getTime();

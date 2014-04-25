@@ -3,6 +3,8 @@ var EventEmitter = require('events').EventEmitter;
 /**
  * The World object contains all terrain and agents that make up the world.
  * The world can exist without any user interaction or display.
+ * 
+ * Emits: agentsUpdate, addAgent
  */
 World = function(tileset, agents) {
  if(!agents) {
@@ -18,7 +20,6 @@ World = function(tileset, agents) {
  
   this.tileset = tileset;
   this.agents = agents;
-  this.watchers = {};
   this.heartbeatCounter = 0;
 }
 
@@ -40,7 +41,9 @@ World.prototype.setAgents = function(agents) {
 }
 World.prototype.addAgent = function(agent) {
   this.agents[agent.identifier] = agent;
+
   this.emit('addAgent', agent);
+  this.emit('agentsUpdate', [agent]);
 }
 World.prototype.getAgentByID = function(identifier) {
   return this.agents[identifier];
@@ -79,95 +82,7 @@ World.prototype.tickServer = function(time) {
     }
   });
 
-  // Pass information to watchers
-  var watcherChanges, watcher, watcherID;
-  for(watcherID in this.watchers) {
-    watcherChanges = [];
-    watcher = this.watchers[watcherID];
-
-    changedAgents.forEach(function(agent) {
-      if(watcher.visibleAgents.indexOf(agent.identifier) != -1) {
-        watcherChanges.push({
-          'type': 'agentUpdate',
-          'agent': agent.toJSON()
-        });
-      }
-    })
-
-    if(watcherChanges.length) {
-      watcher.callback({
-        'timestamp': (new Date()).getTime(),
-        'changes': watcherChanges
-      });
-    } 
-  }
-}
-
-
-/**
- * Add a watcher to this world
- * Watchers will receive events that occur within the given grid of tiles
- * @return watcherID A code to pass back to removeWatcher()
- */
-World.prototype.addWatcher = function(minI, minJ, maxI, maxJ, callback) {
-  var watcherID = 'watcher-' + Math.floor(Math.random()*1000000000);
-  this.watchers[watcherID] = {
-    'minI': minI,
-    'minJ': minJ,
-    'maxI': maxI,
-    'maxJ': maxJ,
-    'callback': callback
-  };
-
-  this.watchers[watcherID].visibleAgents = this.visibleAgentsFor(this.watchers[watcherID]);
-
-  return watcherID;
-}
-
-/**
- * Remove a watcher from the list
- * Watchers will receive events that occur within the given grid of tiles
- */
-World.prototype.removeWatcher = function(watcherID) {
-  delete this.watchers[watcherID];
-}
-
-/**
- * Refresh a watcher, resending all agent data to it
- */
-World.prototype.refreshWatcher = function(watcherID) {
-  var watcher = this.watchers[watcherID];
-  var watcherChanges = [];
-
-  watcherChanges.push({'type': 'clearAgents'});
-
-  this.agents.forEach(function(agent) {
-    if(agent.isWithinTileRect(watcher.minI, watcher.minJ, watcher.maxI, watcher.maxJ)) {
-      watcherChanges.push({
-        'type': 'agentUpdate',
-        'agent': agent.toJSON()
-      });
-    }
-  });
-  
-  watcher.callback({
-    'timestamp': (new Date()).getTime(),
-    'changes': watcherChanges
-  });
-}
-/**
- * Set visible agents in a watcher
- */
-World.prototype.visibleAgentsFor = function(watcher) {
-  visibleAgents = [];
-
-  this.agents.forEach(function(agent) {
-    if(agent.isWithinTileRect(watcher.minI, watcher.minJ, watcher.maxI, watcher.maxJ)) {
-      visibleAgents.push(agent.identifier);
-    }
-  });
-
-  return visibleAgents;
+  this.emit('agentsUpdate', changedAgents);
 }
 
 module.exports = World;

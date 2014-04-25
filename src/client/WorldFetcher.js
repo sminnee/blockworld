@@ -18,7 +18,7 @@ var WorldFetcher = function(world, viewRenderer) {
 
 	__worldFetcher = this;
 
-	this.socket.on('worldChanges', function (data) {
+	this.socket.on('worldChanged', function (data) {
 		__worldFetcher.processWorldChanges(data);
 	});
 
