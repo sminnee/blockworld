@@ -26,6 +26,6 @@
     "socket.io-browserify": "^0.9.6"
   },
   "scripts": {
-    "start": "node ./tools/www"
+    "start": "supervisor -w src/ ./tools/www ./tools/www"
   }
 }
