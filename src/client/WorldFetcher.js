@@ -14,7 +14,7 @@ var WorldFetcher = function(world, viewRenderer) {
 	this.viewRenderer = viewRenderer;
 	// Always connect direct to Node for websockets. I haven't been able to figure out how to get Nginx properly proxying
 	// the websockets yet :-(
-	this.socket = io.connect('ws://' + location.hostname + ':3000');
+	this.socket = io.connect('ws://' + location.hostname + ':' + location.port);
 
 	__worldFetcher = this;
 
