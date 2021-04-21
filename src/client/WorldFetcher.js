@@ -1,5 +1,5 @@
 var $ = require('jquery');
-var io = require('socket.io-browserify');
+var io = require('socket.io-client');
 
 var CellularTileSet = require('../shared/CellularTileSet.js');
 var Agent = require('../shared/Agent.js');

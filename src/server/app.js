@@ -82,9 +82,8 @@ app.put('/api/agent/:id/code', function(req, res){
   });
 });
 
-var io = require('socket.io').listen(server);
-io.set('log level', 1);
-io.sockets.on('connection', function (socket) {
+var io = require('socket.io')(server);
+io.on('connection', function (socket) {
   var watcher = new WorldWatcher(world);
 
   // Update this client's viewport 
