@@ -29,11 +29,23 @@ open http://localhost:3000
 
 ## Starting a prod environment
 
-You'll need supervisord installed, in addition to bower and browserify
+The prod environment is build as a docker package, build from the current working copy with the following command.
 
 ```
-npm install
-bower install
-npm run browserify
-npm start
+npm run docker-build
 ```
+
+You can run the build container with the following command, which will expose it at http://localhost:3000.
+```
+npm run docker-run
+```
+
+You can push the container to digital ocean with the following command, which will(?) update production.
+```
+npm run docker-push
+```
+
+
+
+
+

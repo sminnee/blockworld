@@ -12,7 +12,9 @@
     "socket.io-client": "^4.0.1"
   },
   "scripts": {
-    "start": "supervisor -w src/ ./tools/www ./tools/www",
-    "browserify": "browserify -e src/client/blockworld.js -o dist/blockworld.js"
+    "browserify": "browserify -e src/client/blockworld.js -o dist/blockworld.js",
+    "docker-build": "docker build -t registry.digitalocean.com/tangerine/blockworld .",
+    "docker-run": "docker run -d -p 3000:3000 -t registry.digitalocean.com/tangerine/blockworld",
+    "docker-push": "docker push registry.digitalocean.com/tangerine/blockworld"
   }
 }
