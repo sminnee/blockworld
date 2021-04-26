@@ -1,0 +1,35 @@
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - .gitignore
+      - README.md
+
+jobs:
+  build:
+    name: Deploy to K8S tangerine1
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout master
+      uses: actions/checkout@master
+
+    - name: Update SHA
+      run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/site/_meta
+
+    - name: Build container image
+      run: tools/build $(echo $GITHUB_SHA | head -c7) .
+
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Auth 1 - Log in to DigitalOcean Container Registry with short-lived credentials
+      run: doctl registry login --expiry-seconds 600
+
+    - name: Auth 2 - Save DigitalOcean kubeconfig with short-lived credentials
+      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 70995621-85ef-483a-99cb-86b259f9d2f2
+
+    - name: Push image to DigitalOcean Container Registry and update Kubernetes deployment
+      run: tools/deploy $(echo $GITHUB_SHA | head -c7)
