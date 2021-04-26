@@ -28,7 +28,7 @@ function animationsFor(animal) {
 }
 
 return {
-  'animations' : animationsFor('wolf'),
+  'animations' : animationsFor('sheep'),
 
   'tick' : function(agent, world) {
     agent.move(agent.dX,agent.dY);
