@@ -14,9 +14,6 @@ jobs:
     - name: Checkout master
       uses: actions/checkout@master
 
-    - name: Build container image
-      run: tools/build $(echo $GITHUB_SHA | head -c7) .
-
     - name: Install doctl
       uses: digitalocean/action-doctl@v2
       with:
@@ -27,6 +24,9 @@ jobs:
 
     - name: Auth 2 - Save DigitalOcean kubeconfig with short-lived credentials
       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 70995621-85ef-483a-99cb-86b259f9d2f2
+
+    - name: Build container image
+      run: tools/build $(echo $GITHUB_SHA | head -c7) .
 
     - name: Push image to DigitalOcean Container Registry and update Kubernetes deployment
       run: tools/deploy $(echo $GITHUB_SHA | head -c7)
