@@ -10,6 +10,7 @@ jobs:
   build:
     name: Deploy to K8S tangerine1
     runs-on: ubuntu-latest
+    environment: tangerine1
     steps:
     - name: Checkout master
       uses: actions/checkout@master
