@@ -14,9 +14,6 @@ jobs:
     - name: Checkout master
       uses: actions/checkout@master
 
-    - name: Update SHA
-      run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/site/_meta
-
     - name: Build container image
       run: tools/build $(echo $GITHUB_SHA | head -c7) .
 
