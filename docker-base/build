@@ -1,0 +1,6 @@
+#!/bin/bash
+
+TAG=blockworld-base-0.0.1
+IMAGE=registry.digitalocean.com/tangerine/shared
+docker build -t $IMAGE:$TAG .
+docker push $IMAGE:$TAG

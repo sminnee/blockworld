@@ -1,0 +1,9 @@
+node_modules
+bower_components
+dist
+docker-base
+
+README.md
+.github
+.dockerignore
+Dockerfile

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Deploys a built docker image locally. Requires a tag
+
+APP=blockworld
+
+# Docker Image in DigitalOcean Container Registry
+IMAGE=registry.digitalocean.com/tangerine/shared
+TAGPREFIX="$APP-"
+
+if [ "$1" = "" ]; then
+    echo "Usage: $0 (tag)"
+    exit 1
+fi
+
+IMAGE_FULL="$IMAGE:$TAGPREFIX$1"
+
+docker build -t $IMAGE_FULL .

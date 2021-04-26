@@ -1,11 +1,12 @@
-FROM node:15-alpine
-WORKDIR /app
-RUN apk add git 
-RUN npm install -g bower browserify
-COPY package.json package-lock.json bower.json ./
-RUN npm install --production
-RUN bower --allow-root install
+# Base executor
+FROM registry.digitalocean.com/tangerine/shared:blockworld-base-0.0.1
+
+# Files of relevance to production hosting - see .dockerignore for excluded files
 COPY . .
-RUN npm run browserify
+
+# Package build commands
+RUN npm install --production && bower --allow-root install && npm run browserify
+
+# Start script and port
 EXPOSE 3000
 CMD tools/www

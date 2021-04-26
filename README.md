@@ -27,25 +27,30 @@ Then start the dev server:
 open http://localhost:3000
 ```
 
-## Starting a prod environment
+## Deployment
 
 The prod environment is build as a docker package, build from the current working copy with the following command.
 
 ```
-npm run docker-build
+tools/build (tag)
 ```
 
 You can run the build container with the following command, which will expose it at http://localhost:3000.
 ```
-npm run docker-run
+tools/docker-run (tag)
 ```
 
-You can push the container to digital ocean with the following command, which will(?) update production.
+You can push the container to digital ocean and update the k8s deplyometn with the following command.
 ```
-npm run docker-push
+tools/deploy (tag)
 ```
 
+### blockworld-base
 
+If the blockworld-base image isn't available, you can build it. It's split out to avoid re-building it whenever
+files on the filesystem change.
 
-
-
+```
+cd blockworld-base
+./build
+```
